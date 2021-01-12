@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>驗票機租借</title>
+    
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    
+    <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>
+
+    <script src="/js/main.js"></script>
+    <link rel="stylesheet" href="/css/main.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">    
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.0/themes/smoothness/jquery-ui.css" crossorigin="anonymous">    
+    
+    <script>
+        var app;
+
+        $(document).ready(function () {
+            $(document).on('hidden.bs.modal', '.modal', function () {
+                $('body').toggleClass('modal-open', $('.modal').hasClass('in'));
+            });
+            app = new Vue({
+               el: "#app",
+               data:{
+                    breadcrumbList:[],
+                    deviceName: "",
+                    deviceDestination: "",
+                    deviceType: "全部",
+                    headerList:["訂單序號(OID)","設備名稱","型號","類型"
+                                ,"數量","租借起訖","出貨日","歸還日"
+                                ,"送貨場館","租借公司","檢視明細","編輯"],
+                    insertOrderStep1HeaderList:[
+                        "序號(PID)","設備名稱","型號","類型","倉儲地點","狀態","歸還時間"
+                    ],
+                    deviceDetailHeaderList:[
+                        "序號(PID)","設備名稱","型號","類型","MAC Address","網路狀態","驗票機狀態"
+                    ],
+                    availibleDeviceList:[
+                        {
+                            pid: "D20201031001", 
+                            name: "NX驗票機", 
+                            model: "M001", 
+                            type: "正常機", 
+                            macAddress: "D0-17-C2-D1-80-DC", 
+                            location: "大安",
+                            status: "在庫中",
+                            returnDate: ""
+                        },
+                        {
+                            pid: "D20201031002", 
+                            name: "NX驗票機", 
+                            model: "M001", 
+                            type: "正常機", 
+                            macAddress: "D0-17-C2-D1-80-D1", 
+                            location: "大安",
+                            status: "未在庫",
+                            returnDate: "2021/02/01"
+                        },
+                        {
+                            pid: "D20201031003", 
+                            name: "NX驗票機", 
+                            model: "M001", 
+                            type: "正常機", 
+                            macAddress: "D0-17-C2-D1-80-D2", 
+                            location: "大安",
+                            status: "未在庫",
+                            returnDate: "2021/02/01"
+                        },
+                        {
+                            pid: "D20201031004", 
+                            name: "NX驗票機", 
+                            model: "M001", 
+                            type: "正常機", 
+                            macAddress: "D0-17-C2-D1-80-D3", 
+                            location: "大安",
+                            status: "未在庫",
+                            returnDate: "2021/02/01"
+                        },
+                        {
+                            pid: "D20201031005", 
+                            name: "G3驗票機", 
+                            model: "M003", 
+                            type: "測試機", 
+                            macAddress: "D0-17-C2-D1-80-D4", 
+                            location: "大安",
+                            status: "在庫中",
+                            returnDate: ""
+                        },
+                        {
+                            pid: "D20201031006", 
+                            name: "G2驗票機", 
+                            model: "M002", 
+                            type: "正常機",
+                            macAddress: "D0-17-C2-D1-80-D5",  
+                            location: "大安",
+                            status: "在庫中",
+                            returnDate: ""
+                        },
+                        {
+                            pid: "D20201031007", 
+                            name: "G2驗票機", 
+                            model: "M002", 
+                            type: "正常機", 
+                            macAddress: "D0-17-C2-D1-80-D6", 
+                            location: "大安",
+                            status: "在庫中",
+                            returnDate: ""
+                        },
+                        {
+                            pid: "D20201031008", 
+                            name: "G2驗票機", 
+                            model: "M002", 
+                            type: "正常機", 
+                            macAddress: "D0-17-C2-D1-80-D7", 
+                            location: "大安",
+                            status: "未在庫",
+                            returnDate: "2021/03/01"
+                        },
+                        {
+                            pid: "D20201031009", 
+                            name: "G2驗票機", 
+                            model: "M002", 
+                            type: "正常機", 
+                            macAddress: "D0-17-C2-D1-80-D8", 
+                            location: "大安",
+                            status: "未在庫",
+                            returnDate: "2021/03/01"
+                        },
+                        {
+                            pid: "D20201031010", 
+                            name: "G4驗票機", 
+                            model: "M004", 
+                            type: "測試機", 
+                            macAddress: "D0-17-C2-D1-80-D9", 
+                            location: "大安",
+                            status: "在庫中",
+                            returnDate: ""
+                        }
+                    ],
+                    filteredAvailibleDeviceList:[],
+                    orderInfoList:[],
+                    filteredList:[],
+                    orderDetail:{
+                        ticketSystemList:[]
+                    },
+                    formData:{},
+                    availibleDeviceForm:{
+                        startDate: "",
+                        endDate: "",
+                        model: "M001",
+                        type: "正常機"
+                    },
+                    selectedDevice:[],
+                    newOrderDetail:{
+                        deviceInfoList:[],
+                        functionList:[],
+                        ticketSystemList:[]
+                    },
+                    verifyOffsetOption: [{name: "無", value: 0},
+                                                    {name: "10分鐘內", value: 10},
+                                                    {name: "20分鐘內", value: 20}],
+                    seq: 1,
+                    isEditMode: false
+               },
+               created(){
+                   this.breadcrumbList = [
+                       {name: "首頁",link: "/index.html"},
+                       {name: "驗票機管理",link: ""},
+                       {name: "驗票機租借",link: "/app/device/rent.html"}
+                   ]
+
+                   this.orderInfoList = [
+                       {
+                           oid: "O20201015001", 
+                           name: "3X驗票機", 
+                           deviceInfoList:[
+                                {
+                                    pid: "D20200915001",
+                                    name: "3X驗票機",
+                                    model: "M001",
+                                    type: "正常機",
+                                    macAddress: "D0-17-C2-D1-80-DC",
+                                    networkStatus: "連線",
+                                    status: "驗票中"
+                                }
+                               ],
+                           model: "M001", 
+                           type: "正常機",
+                           verifyOffset: 10,
+                           qty: 1, 
+                           startDate: "2020/10/15",
+                           endDate: "2020/10/30", 
+                           shippingDate: "2020/10/12", 
+                           returnDate: "2020/12/15",
+                           destination: "國家歌劇院", 
+                           company: "寬宏", 
+                           contactName: "李先生" ,
+                           contactPhone: "0939123456",
+                           functionList:[
+                               "臉部辨識","體溫檢測","QRcode"
+                           ],
+                           ticketSystemList:[
+                               "寬宏","UDN"
+                           ]
+                        },
+                       {
+                           oid: "O20201025002", 
+                           name: "NX驗票機", 
+                           deviceInfoList:[
+                                {
+                                    pid: "D20200915002",
+                                    name: "NX驗票機",
+                                    model: "M001",
+                                    type: "正常機",
+                                    macAddress: "D0-17-C2-D1-80-DC",
+                                    networkStatus: "離線",
+                                    status: ""
+                                }    
+                           ],
+                           model: "M001", 
+                           type: "正常機",
+                           verifyOffset: 10,
+                           qty: 1, 
+                           startDate: "2020/11/15",
+                           endDate: "2020/11/30", 
+                           shippingDate: "2020/11/12", 
+                           returnDate: "2020/12/15",
+                           destination: "華山公園", 
+                           company: "寬寬",
+                           contactName: "張先生", 
+                           contactPhone: "0939654321",
+                           functionList: [],
+                           ticketSystemList:[
+                               "中信兄弟"
+                           ] 
+                        },
+                       {
+                           oid: "O20201025002", 
+                           name: "3X驗票機", 
+                           deviceInfoList:[
+                                {
+                                    pid: "D20201115001",
+                                    name: "3X驗票機",
+                                    model: "M002",
+                                    type: "測試機",
+                                    macAddress: "D0-17-C2-D1-80-DC",
+                                    networkStatus: "離線",
+                                    status: ""
+                                },     
+                                {
+                                    pid: "D20201115002",
+                                    name: "3X驗票機",
+                                    model: "M002",
+                                    type: "測試機",
+                                    macAddress: "D0-17-C2-D1-80-DA",
+                                    networkStatus: "離線",
+                                    status: ""
+                                },     
+                                {
+                                    pid: "D20201115003",
+                                    name: "3X驗票機",
+                                    model: "M002",
+                                    type: "測試機",
+                                    macAddress: "D0-17-C2-D1-80-DG",
+                                    networkStatus: "離線",
+                                    status: ""
+                                }     
+                           ],
+                           model: "M002", 
+                           type: "測試機",
+                           verifyOffset: 10,
+                           qty: 3, 
+                           startDate: "2021/01/12",
+                           endDate: "2021/01/31", 
+                           shippingDate: "2021/01/10", 
+                           returnDate: "2021/02/15",
+                           destination: "松菸", 
+                           company: "宏宏", 
+                           contactName: "高先生",
+                           contactPhone: "0939666666",
+                           functionList: [],
+                           ticketSystemList:[
+                               "兩廳院","UDN"
+                           ]
+                        }
+                   ]
+
+                   this.filteredList = this.orderInfoList;
+                   this.filteredAvailibleDeviceList = this.availibleDeviceList;
+                   this.formInit();
+                //    this.queryAvailibleDevice();
+               },
+               mounted: function(){
+                   $(this.$el).find("input[name='startDate']").datepicker({
+                        dateFormat: 'yy/mm/dd',
+                        minDate: new Date()  
+                   }).change((e) => {
+                       this.availibleDeviceForm.startDate = e.target.value;
+                       this.availibleDeviceForm.endDate = "";
+
+                       $("input[name='endDate']").datepicker("option", "minDate",new Date(e.target.value));
+                       
+                       $("input[name='newOrderShippingDate']").datepicker("option", "minDate",new Date());
+                       $("input[name='newOrderShippingDate']").datepicker("option", "maxDate",new Date(e.target.value));
+                   });
+
+                   $(this.$el).find("input[name='endDate']").datepicker({
+                        dateFormat: 'yy/mm/dd'
+                   }).change((e) => {
+                       this.availibleDeviceForm.endDate = e.target.value;
+
+                       $("input[name='newOrderReturnDate']").datepicker("option", "minDate",new Date(e.target.value));
+                   });
+
+                   $(this.$el).find("input[name='newOrderShippingDate']").datepicker({
+                        dateFormat: 'yy/mm/dd'
+                   }).change((e) => {
+                       this.newOrderDetail.shippingDate = e.target.value;
+                   });
+
+                   $(this.$el).find("input[name='newOrderReturnDate']").datepicker({
+                        dateFormat: 'yy/mm/dd'
+                   }).change((e) => {
+                       this.newOrderDetail.returnDate = e.target.value;
+                   });
+
+                   $(this.$el).find("input[name='editShippingDate']").datepicker({
+                        dateFormat: 'yy/mm/dd'
+                   }).change((e) => {
+                       this.newOrderDetail.shippingDate = e.target.value;
+                   });
+
+                   $(this.$el).find("input[name='editReturnDate']").datepicker({
+                        dateFormat: 'yy/mm/dd'
+                   }).change((e) => {
+                       this.newOrderDetail.returnDate = e.target.value;
+                   });
+               },
+               methods:{
+                query: function(){
+                       if(this.deviceType == "全部"){
+                           this.filteredList = this.orderInfoList;
+                       } else {
+                           
+                           this.filteredList = this.orderInfoList.filter(orderInfo => { 
+                                                    return orderInfo.type == this.deviceType
+                                                });
+                       }
+
+                       if(this.deviceName != ""){
+                           this.filteredList = this.filteredList.filter(orderInfo => orderInfo.name.indexOf(this.deviceName) != -1);
+                       }
+
+                       if(this.deviceDestination != ""){
+                           this.filteredList = this.filteredList.filter(orderInfo => orderInfo.destination.indexOf(this.deviceDestination) != -1);
+                       }
+
+                   },
+                showDetail: function(orderInfo){
+                    this.setOrderDetail(orderInfo);
+
+                    this.isEditMode = false;
+
+                    $("#orderDetailModal").modal("show");
+                },
+                showDeviceDetail: function(){
+                    $("#orderDetailModal").modal("hide");
+                    window.setTimeout(function(){$("#orderDeviceDetailModal").modal("show")}, 400);
+                },
+                showOrderDetail: function(){
+                    $("#orderDeviceDetailModal").modal("hide");
+                    window.setTimeout(function(){$("#orderDetailModal").modal("show")}, 400);
+                },
+                formInit: function(){
+                    var date = new Date().toLocaleDateString()
+                                            .replace("/","")
+                                            .replace("/","");
+                    var seq = "000" + this.seq;
+                    seq = seq.substring(seq.length - 3);
+
+                    this.formData = {
+                        pid: "O" + date + seq,
+                        name: "",
+                        model: "M001",
+                        modelOption: ["M001","M002","M003"],
+                        mac: "",
+                        verifyOffsetOption: [{name: "無", value: 0},
+                                                {name: "10分鐘內", value: 10},
+                                                {name: "20分鐘內", value: 20}],
+                        verifyOffset: 10,
+                        typeOption: ["正常機","實驗機","測試機","展示機"],
+                        type: "正常機",
+                        location: ""
+
+                    }
+
+                    this.orderDetail = {
+                        oid: "",
+                        name: "",
+                        model: "",
+                        type: "",
+                        qty: "",
+                        startDate: "",
+                        endDate: "",
+                        shippingDate: "",
+                        returnDate: "",
+                        destination: "",
+                        company: "",
+                        functionList: [],
+                        ticketSystemList: []
+                    }
+
+                    
+                },
+                addOrder: function(){
+                    let newOrder = this.newOrderDetail;
+                    newOrder.deviceInfoList.forEach(element => {
+                        element.networkStatus = "離線中";
+                    });
+                    this.orderInfoList.push(newOrder);
+
+                    this.newOrderDetail = {
+                        deviceInfoList: [],
+                        functionList: [],
+                        ticketSystemList: []
+                    };
+
+                    $("#insertOrderStep2Modal").modal("hide");
+                },
+                edit: function(orderInfo){
+                       this.setOrderDetail(orderInfo);
+
+                       $("input[name='editShippingDate']").datepicker("option", "maxDate",new Date(this.orderDetail.startDate));
+                       $("input[name='editReturnDate']").datepicker("option", "minDate",new Date(this.orderDetail.endDate));
+
+
+                       this.editTarget = orderInfo;
+                       this.isEditMode = true;
+
+                       $("#orderDetailModal").modal("show");
+                },
+                editOrder: function(){
+                    this.orderInfoList.splice(this.orderInfoList.indexOf(this.editTarget),1,this.orderDetail);
+                
+                    this.isEditMode = false;
+                    $("#orderDetailModal").modal("hide");
+                },
+                setOrderDetail: function(orderInfo){
+                    this.orderDetail = {
+                        oid: orderInfo.oid,
+                        name: orderInfo.name,
+                        deviceInfoList: orderInfo.deviceInfoList,
+                        model: orderInfo.model,
+                        type: orderInfo.type,
+                        verifyOffset: orderInfo.verifyOffset,
+                        qty: orderInfo.qty,
+                        startDate: orderInfo.startDate,
+                        endDate: orderInfo.endDate,
+                        shippingDate: orderInfo.shippingDate,
+                        returnDate: orderInfo.returnDate,
+                        contactName: orderInfo.contactName,
+                        contactPhone: orderInfo.contactPhone,
+                        destination: orderInfo.destination,
+                        company: orderInfo.company,
+                        functionList: orderInfo.functionList,
+                        ticketSystemList: orderInfo.ticketSystemList
+                    }
+                },
+                del: function(orderInfo){
+                    this.orderInfoList.splice(this.orderInfoList.indexOf(orderInfo),1);
+                },
+                toggleCheck: function(){
+                    var isAllChecked = $("input[name='insertOrderStep1CheckAll']").prop("checked");
+
+                    $("input[name='deviceInfo']").each(function(){
+                        $(this).prop("checked",isAllChecked);
+                    });
+
+                    if(isAllChecked){
+                        this.selectedDevice = this.filteredAvailibleDeviceList;
+                    } else {
+                        this.selectedDevice = [];
+                    }
+                },
+                queryAvailibleDevice: function(){
+                    if(this.availibleDeviceForm.startDate == "" || this.availibleDeviceForm.endDate == ""){
+                        alert("請填入租賃時間");
+                        return;
+                    }
+
+                    this.filteredAvailibleDeviceList = this.availibleDeviceList.filter(deviceInfo => { 
+                        return deviceInfo.type == this.availibleDeviceForm.type;
+                    });
+
+                    this.filteredAvailibleDeviceList = this.filteredAvailibleDeviceList.filter(deviceInfo => { 
+                        return deviceInfo.model == this.availibleDeviceForm.model;
+                    });
+
+                    this.filteredAvailibleDeviceList = this.filteredAvailibleDeviceList.filter(deviceInfo => { 
+                        
+                        if(deviceInfo.returnDate == ""){
+                            return true;
+                        } else {
+                            let returnDate = new Date(deviceInfo.returnDate).getTime();
+                            let startDate = new Date(this.availibleDeviceForm.startDate).getTime();
+                            
+                            console.log(startDate);
+                            console.log(returnDate);
+                            console.log(startDate >= returnDate);
+
+                            return startDate >= returnDate;
+                        }
+                        
+                        return deviceInfo.model == this.availibleDeviceForm.model;
+                    });
+
+                    this.selectedDevice = [];
+                },
+                toStep2: function(){
+                    if(this.availibleDeviceForm.startDate == "" || this.availibleDeviceForm.endDate == ""){
+                        alert("請填入租賃時間並執行查詢");
+                        return;
+                    }
+
+                    if(this.selectedDevice.length == 0){
+                        alert("尚未選取任何裝置");
+                        return;
+                    }
+
+                    this.newOrderDetail.oid = this.newOrderNo();
+                    this.newOrderDetail.startDate = this.availibleDeviceForm.startDate;
+                    this.newOrderDetail.endDate = this.availibleDeviceForm.endDate;
+                    this.newOrderDetail.model = this.availibleDeviceForm.model;
+                    this.newOrderDetail.type = this.availibleDeviceForm.type;
+                    this.newOrderDetail.name = this.selectedDevice[0].name;
+                    this.newOrderDetail.qty = this.selectedDevice.length;
+                    this.newOrderDetail.deviceInfoList = this.selectedDevice;
+
+                    $("#insertOrderStep1Modal").modal("hide");
+                    window.setTimeout(function(){$("#insertOrderStep2Modal").modal("show")}, 400);
+                },
+                newOrderNo: function(){
+                    var date = new Date();
+                    var dateStr = date.getFullYear() 
+                                + ("0" + (date.getMonth() + 1)).substring(-2)
+                                + ("0" + date.getDate()).substring(-2);
+                    var seq = "000" + this.seq;
+                    seq = seq.substring(seq.length - 3);
+
+                    return "O" + dateStr + seq;
+                }
+               }
+           });
+        });
+        
+    </script>
+</head>
+<body>
+    <div id="app" class="fluid-container">
+        <top-bar></top-bar>
+        <div class="d-flex flex-row">
+            <side-nav></side-nav>
+            <div id="content-area" class="p-2">
+                <breadcrumb :breadcrumblist="breadcrumbList"></breadcrumb>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex flex-row justify-content-between">
+                            <div class="d-flex flex-row w-75">
+                                <div class="input-group w-25 mb-3 mr-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">設備名稱</span>
+                                    </div>
+                                    <input name="deviceName" type="text" class="form-control" v-model="deviceName" placeholder="XXX驗票機">
+                                </div>
+                                <div class="input-group w-25 mb-3 mr-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">送貨場館位置</span>
+                                    </div>
+                                    <input name="deviceDestination" type="text" class="form-control" v-model="deviceDestination" placeholder="國家歌劇院...">
+                                </div>
+                                <div class="form-group mr-3">
+                                    <select name="deviceType" class="form-control" v-model="deviceType">
+                                      <option>全部</option>
+                                      <option>正常機</option>
+                                      <option>測試機</option>
+                                      <option>實驗機</option>
+                                    </select>
+                                </div>
+                                <div class="w-25">
+                                    <button class="btn btn-success" @click="query">查詢</button>
+                                </div>
+                            </div>
+                            <div>
+                                <button class="btn btn-primary" data-toggle="modal" data-target="#insertOrderStep1Modal">新增</button>
+                            </div>
+                            
+                        </div>
+                        <div>
+                            <table class="table table-striped table-bordered">
+                                <thead>
+                                  <tr>
+                                    <th scope="col">#</th>
+                                    <template v-for="header in headerList">
+                                        <th scope="col">{{header}}</th>
+                                    </template>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                    <template v-for="(orderInfo,index) in filteredList">
+                                        <tr>
+                                            <th scope="row">{{index + 1}}</th>
+                                            <td>{{orderInfo.oid}}</td>
+                                            <td>{{orderInfo.name}}</td>
+                                            <td>{{orderInfo.model}}</td>
+                                            <td>{{orderInfo.type}}</td>
+                                            <td>{{orderInfo.qty}} 台</td>
+                                            <td>
+                                                {{orderInfo.startDate}}~ <br/>
+                                                {{orderInfo.endDate}}
+                                            </td>
+                                            <td>{{orderInfo.shippingDate}}</td>
+                                            <td>{{orderInfo.returnDate}}</td>
+                                            <td>{{orderInfo.destination}}</td>
+                                            <td>{{orderInfo.company}}</td>
+                                            <td>
+                                                <button class="btn btn-primary" @click="showDetail(orderInfo)">檢視明細</button>
+                                            </td>
+                                            <td>
+                                                <i class="fa fa-2x fa-pencil mr-2" aria-hidden="true" @click="edit(orderInfo)"></i>
+                                                <i class="fa fa-2x fa-trash" aria-hidden="true" @click="del(orderInfo)"></i>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="orderDetailModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                    <template>
+
+                    </template>
+                    <h5 v-if="isEditMode" class="modal-title">
+                        編輯訂單
+                    </h5>
+                    <h5 v-else class="modal-title">
+                        訂單明細
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">OID</span>
+                        </div>
+                        <input type="text" class="form-control bg-light" :value="orderDetail.oid" disabled>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">設備名稱</span>
+                        </div>
+                        <input type="text" class="form-control bg-light" :value="orderDetail.name" disabled>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">設備ID</span>
+                        </div>
+                        <select multiple class="form-control bg-light" disabled>
+                            <template v-for="deviceInfo in orderDetail.deviceInfoList">
+                                <option>{{ deviceInfo.pid }}</option>
+                            </template>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">型號</span>
+                        </div>
+                        <input type="text" class="form-control bg-light" :value="orderDetail.model" disabled>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">類型</span>
+                        </div>
+                        <input type="text" class="form-control bg-light" :value="orderDetail.type" disabled>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">數量</span>
+                        </div>
+                        <input type="text" class="form-control bg-light" :value="orderDetail.qty" disabled>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">租借起訖</span>
+                        </div>
+                        <input type="text" class="form-control bg-light" :value="orderDetail.startDate" disabled>
+                        <input type="text" class="form-control bg-light" :value="orderDetail.endDate" disabled>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">出貨日</span>
+                        </div>
+                        <input name="editShippingDate" type="text" class="form-control bg-light" v-model="orderDetail.shippingDate" :disabled="!isEditMode" readonly>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">歸還日</span>
+                        </div>
+                        <input name="editReturnDate" type="text" class="form-control bg-light" v-model="orderDetail.returnDate" :disabled="!isEditMode" readonly>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">聯絡人</span>
+                        </div>
+                        <input type="text" class="form-control bg-light" v-model="orderDetail.contactName" :disabled="!isEditMode">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">聯絡電話</span>
+                        </div>
+                        <input type="text" class="form-control bg-light" v-model="orderDetail.contactPhone" :disabled="!isEditMode">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">送貨場館</span>
+                        </div>
+                        <input type="text" class="form-control bg-light" v-model="orderDetail.destination" :disabled="!isEditMode">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">租借公司</span>
+                        </div>
+                        <input type="text" class="form-control bg-light" v-model="orderDetail.company" :disabled="!isEditMode">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">核銷時差</span>
+                        </div>
+                        <select class="form-control bg-light" v-model="orderDetail.verifyOffset" :disabled="!isEditMode">
+                            <template v-for="option in verifyOffsetOption">
+                                <option :value="option.value">{{option.name}}</option>
+                            </template>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">租賃功能清單</span>
+                        </div>
+                        <select multiple class="form-control bg-light" v-model="orderDetail.functionList" :disabled="!isEditMode">
+                            <option>臉部辨識</option>
+                            <option>體溫檢測</option>
+                            <option>QRcode</option>
+                            <option>光碼</option>
+                            <option>紀念票列印</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">串接售票系統</span>
+                        </div>
+                        <select multiple class="form-control bg-light" v-model="orderDetail.ticketSystemList" :disabled="!isEditMode">
+                            <option>兩廳院</option>
+                            <option>寬宏</option>
+                            <option>KKTIX</option>
+                            <option>中信兄弟</option>
+                            <option>UDN</option>
+                        </select>
+                    </div>
+                    <button v-if="isEditMode" type="button" class="btn btn-primary btn-lg btn-block" @click="editOrder">完成編輯</button>
+                    <button v-else type="button" class="btn btn-primary btn-lg btn-block" @click="showDeviceDetail">檢視設備詳情</button>
+                </div>
+                
+              </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="orderDeviceDetailModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-xl" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        裝置詳情
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                          <tr>
+                            <th scope="col">#</th>
+                            <template v-for="header in deviceDetailHeaderList">
+                                <th scope="col">{{header}}</th>
+                            </template>
+                          </tr>
+                        </thead>
+                        <tbody>
+                            <template v-for="(deviceInfo,index) in orderDetail.deviceInfoList">
+                                <tr>
+                                    <th scope="row">{{index + 1}}</th>
+                                    <td>{{deviceInfo.pid}}</td>
+                                    <td>{{deviceInfo.name}}</td>
+                                    <td>{{deviceInfo.model}}</td>
+                                    <td>{{deviceInfo.type}}</td>
+                                    <td>{{deviceInfo.macAddress}}</td>
+                                    <td>{{deviceInfo.networkStatus}}</td>
+                                    <td>{{deviceInfo.status}}</td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                    <button type="button" class="btn btn-primary btn-lg btn-block" @click="showOrderDetail">檢視訂單詳情</button>
+                </div>
+                
+              </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="insertOrderStep1Modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" >
+                      新增訂單 - Step 1 選擇機器
+                  </h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex flex-row w-100">
+                        <div class="input-group w-50 mb-3 mr-3 rent-date">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">租賃時間</span>
+                            </div>
+                            <input name="startDate" type="text" class="form-control" v-model="availibleDeviceForm.startDate" placeholder="起始日期" readonly>
+                            <input name="endDate" type="text" class="form-control" v-model="availibleDeviceForm.endDate" placeholder="結束日期" readonly>
+                        </div>
+                        <div class="input-group w-25 mb-3 mr-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">型號</span>
+                            </div>
+                            <select class="form-control" v-model="availibleDeviceForm.model">
+                                <option>M001</option>
+                                <option>M002</option>
+                                <option>M003</option>
+                                <option>M004</option>
+                            </select>
+                        </div>
+                        <div class="form-group mr-3">
+                            <select class="form-control" v-model="availibleDeviceForm.type">
+                              <option>正常機</option>
+                              <option>測試機</option>
+                            </select>
+                        </div>
+                        <div class="w-25">
+                            <button class="btn btn-success" @click="queryAvailibleDevice">查詢</button>
+                        </div>
+                    </div>
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                          <tr>
+                            <th scope="col"><input name="insertOrderStep1CheckAll" type="checkbox" @change="toggleCheck"></th>
+                            <template v-for="header in insertOrderStep1HeaderList">
+                                <th scope="col">{{header}}</th>
+                            </template>
+                          </tr>
+                        </thead>
+                        <tbody>
+                            <template v-for="(deviceInfo,index) in filteredAvailibleDeviceList">
+                                <tr>
+                                    <th scope="row">
+                                        <input name="deviceInfo" type="checkbox" :value="deviceInfo"
+                                               v-model="selectedDevice">
+                                    </th>
+                                    <td>{{deviceInfo.pid}}</td>
+                                    <td>{{deviceInfo.name}}</td>
+                                    <td>{{deviceInfo.model}}</td>
+                                    <td>{{deviceInfo.type}}</td>
+                                    <td>{{deviceInfo.location}}</td>
+                                    <td>{{deviceInfo.status}}</td>
+                                    <td>{{deviceInfo.returnDate}}</td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                    <button type="button" class="btn btn-primary btn-lg btn-block" @click="toStep2">下一步</button>
+                </div>
+                
+              </div>
+            </div>
+        </div>
+        
+        <div class="modal fade" id="insertOrderStep2Modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" >
+                      新增訂單 - Step 2 訂單詳情
+                  </h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            已選取的裝置
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-striped table-bordered">
+                                <thead>
+                                  <tr>
+                                    <th scope="col">#</th>
+                                    <template v-for="header in insertOrderStep1HeaderList">
+                                        <th scope="col">{{header}}</th>
+                                    </template>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                    <template v-for="(deviceInfo,index) in newOrderDetail.deviceInfoList">
+                                        <tr>
+                                            <th scope="row">
+                                                {{index + 1}}
+                                            </th>
+                                            <td>{{deviceInfo.pid}}</td>
+                                            <td>{{deviceInfo.name}}</td>
+                                            <td>{{deviceInfo.model}}</td>
+                                            <td>{{deviceInfo.type}}</td>
+                                            <td>{{deviceInfo.location}}</td>
+                                            <td>{{deviceInfo.status}}</td>
+                                            <td>{{deviceInfo.returnDate}}</td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card mb-3">
+                        <div class="card-header">
+                          訂單詳情
+                        </div>
+                        <div class="card-body">
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text w-th">OID</span>
+                                </div>
+                                <input type="text" class="form-control bg-light" :value="newOrderDetail.oid" disabled>
+                            </div>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text w-th">數量</span>
+                                </div>
+                                <input type="text" class="form-control bg-light" :value="newOrderDetail.qty" disabled>
+                            </div>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text w-th">租借起訖</span>
+                                </div>
+                                <input type="text" class="form-control bg-light" :value="newOrderDetail.startDate" disabled>
+                                <input type="text" class="form-control bg-light" :value="newOrderDetail.endDate" disabled>
+                            </div>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text w-th">出貨日</span>
+                                </div>
+                                <input name="newOrderShippingDate" type="text" class="form-control bg-light" v-model="newOrderDetail.shippingDate">
+                            </div>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text w-th">歸還日</span>
+                                </div>
+                                <input name="newOrderReturnDate" type="text" class="form-control bg-light" v-model="newOrderDetail.returnDate">
+                            </div>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text w-th">聯絡人</span>
+                                </div>
+                                <input type="text" class="form-control bg-light" v-model="newOrderDetail.contactName">
+                            </div>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text w-th">連絡電話</span>
+                                </div>
+                                <input type="text" class="form-control bg-light" v-model="newOrderDetail.contactPhone">
+                            </div>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text w-th">送貨場館</span>
+                                </div>
+                                <input type="text" class="form-control bg-light" v-model="newOrderDetail.destination">
+                            </div>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text w-th">租借公司</span>
+                                </div>
+                                <input type="text" class="form-control bg-light" v-model="newOrderDetail.company">
+                            </div>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text w-th">核銷時差</span>
+                                </div>
+                                <select class="form-control bg-light" v-model="newOrderDetail.verifyOffset">
+                                    <template v-for="option in verifyOffsetOption">
+                                        <option :value="option.value">{{option.name}}</option>
+                                    </template>
+                                </select>
+                            </div>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text">租賃功能清單</span>
+                                </div>
+                                <select multiple class="form-control bg-light" v-model="newOrderDetail.functionList">
+                                    <option>臉部辨識</option>
+                                    <option>體溫檢測</option>
+                                    <option>QRcode</option>
+                                    <option>光碼</option>
+                                    <option>紀念票列印</option>
+                                </select>
+                            </div>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text">串接售票系統</span>
+                                </div>
+                                <select multiple class="form-control bg-light" v-model="newOrderDetail.ticketSystemList">
+                                    <option>兩廳院</option>
+                                    <option>寬宏</option>
+                                    <option>KKTIX</option>
+                                    <option>中信兄弟</option>
+                                    <option>UDN</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-lg btn-block" @click="addOrder">送出訂單</button>
+                </div>
+                
+              </div>
+            </div>
+        </div>
+
+   </div>
+</body>
+</html>

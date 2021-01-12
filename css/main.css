@@ -1,0 +1,15 @@
+#side-nav {
+    width: 180px;
+}
+
+#content-area {
+    width: calc(100% - 180px)
+}
+
+.w-th {
+    width: 100px;
+}
+
+.ui-datepicker {
+    z-index: 1051 !important;
+}
