@@ -13,19 +13,101 @@
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
     
+    <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>
+
     <script src="/js/main.js"></script>
+    <script src="/js/jquery.qrcode.min.js"></script>
     <link rel="stylesheet" href="/css/main.css">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">    
-    
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.0/themes/smoothness/jquery-ui.css" crossorigin="anonymous">    
+
     <script>
         var app;
 
         $(document).ready(function () {
+            
             app = new Vue({
                el: "#app",
                data:{
-                    breadcrumbList:[]
+                    breadcrumbList:[],
+                    queryParam:{
+                        userId: "",
+                        name: "",
+                        company: "all",
+                        status: "all"
+                    },
+                    activityQueryParam: {
+                        name: "",
+                        startDate: "",
+                        endDate: "",
+                        location: "",
+                        organizer: ""
+                    },
+                    formData: {
+                        companyOption: [
+                            {
+                                name: "寬寬",
+                                value: "1"
+                            },
+                            {
+                                name: "宏宏",
+                                value: "2"
+                            },
+                            {
+                                name: "寬宏",
+                                value: "3"
+                            },
+                            {
+                                name: "神腦國際",
+                                value: "4"
+                            }
+                        ],
+                        statusOption:[
+                            {
+                                name: "啟用",
+                                value: "active"
+                            },
+                            {
+                                name: "停用",
+                                value: "inactive"
+                            },
+                            {
+                                name: "過期",
+                                value: "expired"
+                            }
+                        ],
+                        organizerOption: [
+                            {
+                                name: "寬宏",
+                                value: "1"
+                            },
+                            {
+                                name: "UDN",
+                                value: "2"
+                            },
+                            {
+                                name: "KKTIX",
+                                value: "3"
+                            },
+                            {
+                                name: "兩廳院",
+                                value: "4"
+                            }
+                        ],
+                    },
+                    headerList:["帳號","姓名","狀態","帳號有效時間","連絡電話","所屬公司","驗票場次及入場選項","編輯"],
+                    activityHeaderList:["活動名稱","場次","地點"],
+                    userList:[],
+                    filteredList:[],
+                    availibleActivityList:[],
+                    filteredActivityList:[],
+                    selectedActivity:{},
+                    userDetail:{},
+                    editTarget:{},
+                    isEditMode: false,
+                    isInsertMode: false,
+                    isActivitySelected: false,
                },
                created(){
                    this.breadcrumbList = [
@@ -33,7 +115,418 @@
                        {name: "帳號管理",link: ""},
                        {name: "驗票人員",link: "/app/account/inspector.html"}
                    ]
+
+                   this.userList = [
+                        {
+                            userId: "AEB01",
+                            password: "abc9814016",
+                            name: "王小明",
+                            company: "1",
+                            type: "inspector",
+                            mobile: "0939739171",
+                            status: "active", 
+                            activityList:[
+                                {
+                                    id: "125",
+                                    name: "黃大千展",
+                                    activityDate: "2021/1/15",
+                                    activityTime: "08:00",
+                                    location: "北美館"
+                                },
+                                {
+                                    id: "130",
+                                    name: "派大星展",
+                                    activityDate: "2021/1/19",
+                                    activityTime: "11:00",
+                                    location: "華山廣場"
+                                },
+                                {
+                                    id: "131",
+                                    name: "中職冠軍賽",
+                                    activityDate: "2021/2/20",
+                                    activityTime: "15:00",
+                                    location: "澄清湖棒球場"
+                                }
+                            ],
+                            activeDate: "2021/01/01", 
+                            inactiveDate: "2021/02/01", 
+                        },
+                        {
+                            userId: "AEB02",
+                            password: "abc9814016",
+                            name: "王小二",
+                            company: "2",
+                            type: "inspector",
+                            mobile: "0939711156",
+                            status: "active", 
+                            activityList: [
+                                {
+                                    id: "125",
+                                    name: "黃大千展",
+                                    activityDate: "2021/1/15",
+                                    activityTime: "08:00",
+                                    location: "北美館"
+                                },
+                                {
+                                    id: "130",
+                                    name: "派大星展",
+                                    activityDate: "2021/1/19",
+                                    activityTime: "11:00",
+                                    location: "華山廣場"
+                                },
+                            ],
+                            activeDate: "2021/01/01", 
+                            inactiveDate: "2021/02/01", 
+                        },
+                        {
+                            userId: "AEB03",
+                            password: "abc9814016",
+                            name: "王一傳",
+                            company: "3",
+                            type: "inspector",
+                            mobile: "0939654321",
+                            status: "active", 
+                            activityList: [
+                                {
+                                    id: "130",
+                                    name: "派大星展",
+                                    activityDate: "2021/1/19",
+                                    activityTime: "11:00",
+                                    location: "華山廣場"
+                                },
+                            ],
+                            activeDate: "2021/01/01", 
+                            inactiveDate: "2021/02/01", 
+                        },
+                        {
+                            userId: "AEB04",
+                            password: "abc9814016",
+                            name: "李大明",
+                            company: "4",
+                            type: "inspector",
+                            mobile: "0939123456",
+                            status: "active", 
+                            activityList: [
+                                {
+                                    id: "131",
+                                    name: "中職冠軍賽",
+                                    activityDate: "2021/2/20",
+                                    activityTime: "15:00",
+                                    location: "澄清湖棒球場"
+                                }
+                            ],
+                            activeDate: "2021/01/01", 
+                            inactiveDate: "2021/02/01", 
+                        },
+                   ]
+
+                   this.filteredList = this.userList;
+
+                   this.availibleActivityList = [
+                       {
+                           id: "197",
+                           name: "超級英雄展",
+                           activityDate: "2021/1/19",
+                           activityTime: "11:00",
+                           location: "華山公園",
+                           organizer: "3"
+                       },
+                       {
+                           id: "198",
+                           name: "超級火車展",
+                           activityDate: "2021/1/28",
+                           activityTime: "11:00",
+                           location: "228公園",
+                           organizer: "1"
+                       },
+                       {
+                           id: "199",
+                           name: "SBL季後賽第一場",
+                           activityDate: "2021/7/15",
+                           activityTime: "15:00",
+                           location: "新莊體育館",
+                           organizer: "4"
+                       },
+                       {
+                           id: "200",
+                           name: "2021旅展",
+                           activityDate: "2021/3/2",
+                           activityTime: "10:00",
+                           location: "世貿一館",
+                           organizer: "2"
+                       },
+                       {
+                           id: "201",
+                           name: "2021新車大展",
+                           activityDate: "2021/12/28",
+                           activityTime: "10:00",
+                           location: "五股工商展覽館",
+                           organizer: "4"
+                       },
+                   ]
+
+                   this.filteredActivityList = this.availibleActivityList;
+               },
+               mounted:function(){
+                    this.bindDatepicker();
+
+                    $("#userDetailModal").on("hidden.bs.modal",(event) => {
+                        this.isInsertMode = false;
+                        this.isEditMode = false;
+                    });
+
+                    $("#qrcodeModal").on("hidden.bs.modal",(event) => {
+                        $("#userDetailModal").modal("show");
+                    });
+
+                    $("#passwordEditModal").on("hidden.bs.modal",(event) => {
+                        this.isEditMode = true;
+                        $("#userDetailModal").modal("show");
+                    });
+
+                    $("#selectActivityModal").on("hidden.bs.modal",(event) => {
+                        this.isEditMode = true;
+                        $("#userDetailModal").modal("show");
+                    });
+               },
+               methods:{
+                    bindDatepicker: function(){
+                        $(this.$el).find("input[name='activeDate']").datepicker({
+                            dateFormat: 'yy/mm/dd',
+                            minDate: new Date()  
+                        }).change((e) => {
+                            this.userDetail.activeDate = e.target.value;
+                            this.userDetail.inactiveDate = "";
+
+                            $("input[name='inactiveDate']").datepicker("option", "minDate",new Date(e.target.value));
+                        });
+
+                        $(this.$el).find("input[name='inactiveDate']").datepicker({
+                                dateFormat: 'yy/mm/dd'
+                        }).change((e) => {
+                            this.userDetail.inactiveDate = e.target.value;
+                        });
+                    },
+                    query: function(){
+                            
+                        if(this.queryParam.status == "all"){
+                            this.filteredList = this.userList;    
+                        } else {
+                            this.filteredList = this.userList.filter(userInfo => userInfo.status == this.queryParam.status);
+                        }
+
+                        if(this.queryParam.company != "all"){
+                            this.filteredList = this.filteredList.filter(userInfo => userInfo.company == this.queryParam.company);
+                        }
+
+                        if(this.queryParam.userId != ""){
+                            this.filteredList = this.filteredList.filter(userInfo => userInfo.userId.indexOf(this.queryParam.userId) != -1);
+                        }
+
+                        if(this.queryParam.name != ""){
+                            this.filteredList = this.filteredList.filter(userInfo => userInfo.name.indexOf(this.queryParam.name) != -1);
+                        }
+
+                    },
+                    getCompanyName: function(company){
+                        let name = "無效的公司名稱";
+
+                        this.formData.companyOption.forEach(element => {
+                            if(element.value == company){
+                                name = element.name;
+                            }
+                        });
+
+                        return name;
+                    },
+                    getStatusName: function(status){
+                        let name = "無效的狀態";
+
+                        this.formData.statusOption.forEach(element => {
+                            if(element.value == status){
+                                name = element.name;
+                            }
+                        });
+
+                        return name;
+                    },
+                    getOrganizerName: function(organizer){
+                        let name = "無效的狀態";
+
+                        this.formData.organizerOption.forEach(element => {
+                            if(element.value == organizer){
+                                name = element.name;
+                            }
+                        });
+
+                        return name;
+                    },
+                    showUserDetail: function(userInfo){
+                        this.userDetail = userInfo;
+
+                        $("#userDetailModal").modal("show");
+                    },
+                    showQrcodeModal: function(activityDetail){
+
+                        let loginAction = {
+                            userId: this.userDetail.userId,
+                            activityTimeId: activityDetail.id,
+                            action: "login" 
+                        }
+
+                        let passAction = {
+                            userId: this.userDetail.userId,
+                            activityTimeId: activityDetail.id,
+                            action: "pass" 
+                        }
+
+                        let rejectAction = {
+                            userId: this.userDetail.userId,
+                            activityTimeId: activityDetail.id,
+                            action: "reject" 
+                        }
+                      
+                        $("#loginQrcode").html("");
+                        $("#passQrcode").html("");
+                        $("#rejectQrcode").html("");
+
+                        $("#loginQrcode").qrcode(JSON.stringify(loginAction));
+                        $("#passQrcode").qrcode(JSON.stringify(passAction));
+                        $("#rejectQrcode").qrcode(JSON.stringify(rejectAction));
+
+                        $("#userDetailModal").modal("hide");
+
+                        window.setTimeout(function(){$("#qrcodeModal").modal("show")}, 400);
+                    },
+                    edit: function(userInfo){
+                        this.bindDatepicker();
+
+                        this.editTarget = userInfo;
+
+                        this.userDetail = {
+                            userId: userInfo.userId,
+                            password: userInfo.password,
+                            name: userInfo.name,
+                            type: userInfo.type,
+                            activeDate: userInfo.activeDate,
+                            inactiveDate: userInfo.inactiveDate,
+                            status: userInfo.status,
+                            mobile: userInfo.mobile,
+                            company: userInfo.company,
+                            activityList: userInfo.activityList.slice(),
+                        }
+
+                        this.isEditMode = true;
+
+                        $("#userDetailModal").modal("show");
+                    },
+                    showEditPasswordModal: function(){
+                        $("#userDetailModal").modal("hide");
+
+                        window.setTimeout(function(){$("#passwordEditModal").modal("show")}, 400);
+                    },
+                    passwordVerify: function(){
+                        if(this.userDetail.password != this.userDetail.originalPassword){
+                            alert("原密碼輸入錯誤");
+                        }
+                    },
+                    editPassword: function(){
+                        if(this.userDetail.password != this.userDetail.originalPassword){
+                            alert("原密碼輸入錯誤");
+                            return;
+                        }
+                        this.userDetail.password = this.userDetail.newPassword;
+                        this.userDetail.originalPassword = "";
+                        this.userDetail.newPassword = "";
+
+                        $("#passwordEditModal").modal("hide");
+                    },
+                    editUser: function(){
+                        let currTime = new Date().getTime();
+                        let activeTime = new Date(this.userDetail.activeDate).getTime();
+
+                        if(activeTime > currTime){
+                            this.userDetail.status = "inactive";
+                        } else {
+                            this.userDetail.status = "active";
+                        }
+
+                        this.userList.splice(this.userList.indexOf(this.editTarget),1,this.userDetail);
+
+                        $("#userDetailModal").modal("hide");
+                    },
+                    add: function(){
+                        
+
+                        this.isInsertMode = true;
+
+                        this.resetUserDetail();
+
+                        window.setTimeout(() =>{this.bindDatepicker()}, 400);
+                        
+
+                        $("#userDetailModal").modal("show");
+                    },
+                    addUser: function(){
+                        let newUser = this.userDetail;
+
+                        let currTime = new Date().getTime();
+                        let activeTime = new Date(newUser.activeDate).getTime();
+
+                        if(activeTime > currTime){
+                            newUser.status = "inactive";
+                        } else {
+                            newUser.status = "active";
+                        }
+
+                        this.userList.push(newUser);
+
+                        $("#userDetailModal").modal("hide");
+                    },
+                    resetUserDetail: function(){
+                        this.userDetail = {
+                            userId: "",
+                            password: "",
+                            name: "",
+                            type: "",
+                            activeDate: "",
+                            inactiveDate: "",
+                            status: "",
+                            mobile: "",
+                            company: "",
+                            activityList: [],
+                        }
+                    },
+                    delUser: function(userInfo){
+                        this.userList.splice(this.userList.indexOf(userInfo),1);
+                    },
+                    showSelectActivityModal: function(){
+                        $("#userDetailModal").modal("hide");
+
+                        window.setTimeout(()=>{$("#selectActivityModal").modal("show")},400);
+                    },
+                    activityQuery: function(){
+
+                    },
+                    selectActivity: function(activityInfo){
+                        this.selectedActivity = activityInfo;
+                        this.isActivitySelected = true;
+                    },
+                    addActivity: function(){
+                        let newActivity = this.selectedActivity;
+
+                        this.userDetail.activityList.push(newActivity);
+
+                        this.selectedActivity = {};
+                        this.isActivitySelected = false;
+
+                        $("#selectActivityModal").modal("hide");
+                    },
+                    delActivity: function(activityInfo){
+                        this.userDetail.activityList.splice(this.userDetail.activityList.indexOf(activityInfo),1);
+                    },
                }
+
            });
         });
         
@@ -45,11 +538,418 @@
         <top-bar></top-bar>
         <div class="d-flex flex-row">
             <side-nav></side-nav>
-            <div class="w-75 p-2">
+            <div class="w-100 p-2">
                 <breadcrumb :breadcrumblist="breadcrumbList"></breadcrumb>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex flex-row justify-content-between">
+                            <div class="d-flex flex-row w-90">
+                                <div class="input-group w-25 mb-3 mr-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">使用者帳號</span>
+                                    </div>
+                                    <input type="text" class="form-control" v-model="queryParam.userId">
+                                </div>
+                                <div class="input-group w-25 mb-3 mr-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">使用者名稱</span>
+                                    </div>
+                                    <input  type="text" class="form-control" v-model="queryParam.name">
+                                </div>
+                                <div class="input-group w-20 mb-3 mr-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">主辦單位</span>
+                                    </div>
+                                    <select class="form-control" v-model="queryParam.company">
+                                        <option value="all">全部</option>
+                                        <template v-for="option in formData.companyOption">
+                                            <option :value="option.value">{{option.name}}</option>
+                                        </template>
+                                    </select>
+                                </div>
+                                <div class="input-group w-20 mb-3 mr-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">狀態</span>
+                                    </div>
+                                    <select class="form-control" v-model="queryParam.status">
+                                        <option value="all">全部</option>
+                                        <template v-for="option in formData.statusOption">
+                                            <option :value="option.value">{{option.name}}</option>
+                                        </template>
+                                    </select>
+                                </div>
+                                <div class="w-10">
+                                    <button class="btn btn-success" @click="query">查詢</button>
+                                </div>
+                            </div>
+                            <div>
+                                <button class="btn btn-primary" data-toggle="modal" @click="add">新增</button>
+                            </div>
+                            
+                        </div>
+
+                        <div>
+                            <table class="table table-striped table-bordered">
+                                <thead>
+                                  <tr>
+                                    <th scope="col">#</th>
+                                    <template v-for="header in headerList">
+                                        <th scope="col">{{header}}</th>
+                                    </template>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                    <template v-for="(userInfo,index) in filteredList">
+                                        <tr>
+                                            <th scope="row">{{index + 1}}</th>
+                                            <td>{{userInfo.userId}}</td>
+                                            <td>{{userInfo.name}}</td>
+                                            <td>{{getStatusName(userInfo.status)}}</td>
+                                            <td>{{userInfo.activeDate}} ~<br/>
+                                                {{userInfo.inactiveDate}}
+                                            </td>
+                                            <td>
+                                                {{userInfo.mobile}}
+                                            </td>
+                                            <td>{{getCompanyName(userInfo.company)}}</td>
+                                            <td>
+                                                <button class="btn btn-primary btn-lg btn-block" @click="showUserDetail(userInfo)">檢視明細</button>
+                                            </td>
+                                            <td>
+                                                <i class="fa fa-2x fa-pencil mr-2" aria-hidden="true" @click="edit(userInfo)"></i>
+                                                <i class="fa fa-2x fa-trash" aria-hidden="true" @click="delUser(userInfo)"></i>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                              </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        
+
+        <div class="modal fade" id="userDetailModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                    <template v-if="isInsertMode">
+                        <h5 class="modal-title">
+                            新增使用者
+                        </h5>
+                    </template>
+                    <template v-else>
+                        <h5 v-if="isEditMode" class="modal-title">
+                            編輯使用者
+                        </h5>
+                        
+                        <h5 v-else class="modal-title">
+                            檢視明細
+                        </h5>
+                    </template>
+                    
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">使用者帳號</span>
+                        </div>
+                        <input type="text" class="form-control bg-light" v-model="userDetail.userId" :disabled="!isInsertMode">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text w-th">使用者密碼</span>
+                        </div>
+                        <input type="password" class="form-control bg-light" v-model="userDetail.password" :disabled="!isInsertMode">
+                        <button v-if="isEditMode" type="button" class="btn btn-warning ml-3" @click="showEditPasswordModal">修改密碼</button>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">使用者名稱</span>
+                        </div>
+                        <input type="text" class="form-control bg-light" v-model="userDetail.name" :disabled="!(isEditMode || isInsertMode)">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">手機</span>
+                        </div>
+                        <input type="text" class="form-control bg-light" v-model="userDetail.mobile" :disabled="!(isEditMode || isInsertMode)">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">所屬公司</span>
+                        </div>
+                        <select class="form-control" v-model="userDetail.company" :disabled="!(isEditMode || isInsertMode)">
+                            <template v-for="option in formData.companyOption">
+                                <option :value="option.value">{{option.name}}</option>
+                            </template>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">帳號有效時間</span>
+                        </div>
+                        <input name="activeDate" type="text" class="form-control bg-light" autocomplete="off" v-model="userDetail.activeDate" :disabled="!(isEditMode || isInsertMode)">
+                        <input name="inactiveDate" type="text" class="form-control bg-light" autocomplete="off" v-model="userDetail.inactiveDate" :disabled="!(isEditMode || isInsertMode)">
+                    </div>
+                    <div v-if="!isInsertMode" class="card mb-3">
+                        <div class="card-header">
+                            驗票場次清單
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-striped table-bordered">
+                                <thead>
+                                  <tr>
+                                    <th scope="col">#</th>
+                                    <template v-for="header in activityHeaderList">
+                                        <th scope="col">{{header}}</th>
+                                    </template>
+                                    <th v-if="isEditMode" scope="col">編輯</th>
+                                    <th v-else scope="col">QRcode</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                    <template v-for="(activityDetail,index) in userDetail.activityList">
+                                        <tr>
+                                            <th scope="row">{{index + 1}}</th>
+                                            <td>{{activityDetail.name}}</td>
+                                            <td>{{activityDetail.activityDate}} {{activityDetail.activityTime}}</td>
+                                            <td>{{activityDetail.location}}</td>
+                                            <td>
+                                                <i v-if="isEditMode" class="fa fa-2x fa-trash" aria-hidden="true" @click="delActivity(activityDetail)" ></i>
+                                                <i v-else class="fa fa-2x fa-external-link" aria-hidden="true" @click="showQrcodeModal(activityDetail)" ></i>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                            <button v-if="isEditMode" class="btn btn-primary btn-lg btn-block" @click="showSelectActivityModal">新增驗票活動</button>
+                        </div>
+                    </div>
+
+                    <button v-if="isInsertMode" class="btn btn-primary btn-lg btn-block" @click="addUser">新增使用者</button>
+                    <button v-if="isEditMode" class="btn btn-primary btn-lg btn-block" @click="editUser">儲存變更</button>
+                    
+                </div>
+                
+              </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="qrcodeModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        驗票人員用QRcode
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            驗票人員登入
+                        </div>
+                        <div class="card-body">
+                            <div id="loginQrcode"></div>
+                        </div>
+                    </div>
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            驗票通過
+                        </div>
+                        <div class="card-body">
+                            <div id="passQrcode"></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            驗票不通過
+                        </div>
+                        <div class="card-body">
+                            <div id="rejectQrcode"></div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+              </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="passwordEditModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        修改密碼
+                    </h5>
+                    <button type="button" class="close" >
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">原密碼</span>
+                        </div>
+                        <input type="password" class="form-control bg-light" v-model="userDetail.originalPassword" @change="passwordVerify">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">新密碼</span>
+                        </div>
+                        <input type="password" class="form-control bg-light" v-model="userDetail.newPassword" >
+                    </div>
+                    <button type="button" class="btn btn-primary btn-lg btn-block" @click="editPassword">儲存密碼</button>
+                </div>
+                
+              </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="selectActivityModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-xl" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        選擇驗票活動
+                    </h5>
+                    
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                    <div v-if="isActivitySelected">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                已選定的活動
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-striped table-bordered">
+                                    <thead>
+                                      <tr>
+                                        <template v-for="header in activityHeaderList">
+                                            <th scope="col">{{header}}</th>
+                                        </template>
+                                        <th scope="col">主辦單位</th>
+                                        <th scope="col">驗票人員詳情</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>{{selectedActivity.name}}</td>
+                                            <td>{{selectedActivity.activityDate}} {{selectedActivity.activityTime}}</td>
+                                            <td>{{selectedActivity.location}}</td>
+                                            <td>{{getOrganizerName(selectedActivity.organizer)}}</td>
+                                            <td>
+                                                <button class="btn btn-primary">檢視詳情</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                驗票活動詳情
+                            </div>
+                            <div class="card-body">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                      <span class="input-group-text">驗票起迄時間</span>
+                                    </div>
+                                    <input type="text" class="form-control bg-light" autocomplete="off"/>
+                                    <input type="text" class="form-control bg-light" autocomplete="off"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary btn-lg btn-block" @click="addActivity">儲存驗票活動</button>
+                    </div>
+                    <div v-else>
+                        <div class="d-flex flex-row w-100">
+                            <div class="input-group w-25 mb-3 mr-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">活動名稱</span>
+                                </div>
+                                <input type="text" class="form-control" v-model="activityQueryParam.name">
+                            </div>
+                            <div class="input-group w-25 mb-3 mr-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">活動時間</span>
+                                </div>
+                                <input  type="text" class="form-control" v-model="activityQueryParam.startDate">
+                                <input  type="text" class="form-control" v-model="activityQueryParam.endDate">
+                            </div>
+                            <div class="input-group w-20 mb-3 mr-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">活動地點</span>
+                                </div>
+                                <input  type="text" class="form-control" v-model="activityQueryParam.location">
+                            </div>
+                            <div class="input-group w-20 mb-3 mr-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">主辦單位</span>
+                                </div>
+                                <select class="form-control" v-model="activityQueryParam.organizer">
+                                    <option value="all">全部</option>
+                                    <template v-for="option in formData.organizerOption">
+                                        <option :value="option.value">{{option.name}}</option>
+                                    </template>
+                                </select>
+                            </div>
+    
+                            <div class="w-10">
+                                <button class="btn btn-success" @click="activityQuery">查詢</button>
+                            </div>
+                        </div>
+                        <div>
+                            <table class="table table-striped table-bordered">
+                                <thead>
+                                  <tr>
+                                    <th scope="col">#</th>
+                                    <template v-for="header in activityHeaderList">
+                                        <th scope="col">{{header}}</th>
+                                    </template>
+                                    <th scope="col">主辦單位</th>
+                                    <th scope="col">驗票人員詳情</th>
+                                    <th scope="col">選擇活動</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                    <template v-for="(activityInfo,index) in filteredActivityList">
+                                        <tr>
+                                            <th scope="row">{{index + 1}}</th>
+                                            <td>{{activityInfo.name}}</td>
+                                            <td>{{activityInfo.activityDate}} {{activityInfo.activityTime}}</td>
+                                            <td>{{activityInfo.location}}</td>
+                                            <td>{{getOrganizerName(activityInfo.organizer)}}</td>
+                                            <td>
+                                                <button class="btn btn-primary">檢視詳情</button>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-primary" @click="selectActivity(activityInfo)">選擇活動</button>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+              </div>
+            </div>
+        </div>
+
    </div>
 </body>
 </html>

@@ -166,6 +166,9 @@
                         this.editUser.inactiveDate = e.target.value;
                     });
 
+                    $("#passwordEditModal").on("hidden.bs.modal",function(event){
+                        $("#userModifyModal").modal("show");
+                    });
                 },
                 methods:{
                     query: function(){
@@ -234,7 +237,6 @@
                         $("#userModifyModal").modal("hide");
 
                         window.setTimeout(function(){$("#passwordEditModal").modal("show")}, 400);
-
                     },
                     passwordVerify: function(){
                         if(this.editUser.password != this.editUser.originalPassword){
@@ -251,13 +253,6 @@
                         this.editUser.newPassword = "";
 
                         $("#passwordEditModal").modal("hide");
-
-                        window.setTimeout(function(){$("#userModifyModal").modal("show")}, 400);
-                    },
-                    returnUserModifyModal:function(){
-                        $("#passwordEditModal").modal("hide");
-                        
-                        window.setTimeout(function(){$("#userModifyModal").modal("show")}, 400);
                     },
                     saveEdit: function(){
                         let currTime = new Date().getTime();
@@ -329,7 +324,7 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="d-flex flex-row justify-content-between">
-                            <div class="d-flex flex-row w-75">
+                            <div class="d-flex flex-row w-90">
                                 <div class="input-group w-25 mb-3 mr-3">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">使用者帳號</span>
@@ -342,7 +337,10 @@
                                     </div>
                                     <input  type="text" class="form-control" v-model="queryParam.name">
                                 </div>
-                                <div class="form-group mr-3">
+                                <div class="input-group w-20 mb-3 mr-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">類型</span>
+                                    </div>
                                     <select class="form-control" v-model="queryParam.type">
                                         <option value="all">全部</option>
                                         <template v-for="option in formData.typeOption">
@@ -350,7 +348,10 @@
                                         </template>
                                     </select>
                                 </div>
-                                <div class="form-group mr-3">
+                                <div class="input-group w-20 mb-3 mr-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">狀態</span>
+                                    </div>
                                     <select class="form-control" v-model="queryParam.status">
                                         <option value="all">全部</option>
                                         <template v-for="option in formData.statusOption">
@@ -358,7 +359,7 @@
                                         </template>
                                     </select>
                                 </div>
-                                <div class="w-25">
+                                <div class="w-10">
                                     <button class="btn btn-success" @click="query">查詢</button>
                                 </div>
                             </div>
@@ -434,6 +435,7 @@
                             <span class="input-group-text w-th">使用者密碼</span>
                         </div>
                         <input type="password" class="form-control bg-light" v-model="editUser.password" :disabled="isEditMode">
+                        <button v-if="isEditMode" type="button" class="btn btn-warning ml-3" @click="showEditPasswordModal">修改密碼</button>
                     </div>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
@@ -472,7 +474,6 @@
                     </div>
                     
                     <template v-if="isEditMode">
-                        <button type="button" class="btn btn-warning btn-lg btn-block" @click="showEditPasswordModal">修改密碼</button>
                         <button type="button" class="btn btn-primary btn-lg btn-block" @click="saveEdit">完成編輯</button>
                     </template>
                     <template v-else>
@@ -492,7 +493,7 @@
                     <h5 class="modal-title">
                         修改密碼
                     </h5>
-                    <button type="button" class="close" @click="returnUserModifyModal" >
+                    <button type="button" class="close" >
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
