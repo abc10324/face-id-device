@@ -17,7 +17,9 @@
 
     <script src="/js/main.js"></script>
     <script src="/js/jquery.qrcode.min.js"></script>
+    <script src="/js/timepicker-addon.js"></script>
     <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/timepicker.css">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">    
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.0/themes/smoothness/jquery-ui.css" crossorigin="anonymous">    
@@ -364,6 +366,23 @@
                     }).change((e) => {
                         this.activityQueryParam.endDate = e.target.value;
                     });
+
+                    $(this.$el).find("#addActivityModal input[name='startDate']").datetimepicker({
+                            dateFormat: 'yy/mm/dd',
+                            controlType: "select"
+                    }).change((e) => {
+                        this.selectedActivity.activeTime = e.target.value;
+
+                        $("#addActivityModal input[name='endDate']").datetimepicker("option", "minDate",new Date(e.target.value));
+                        $("#addActivityModal input[name='endDate']").datetimepicker("option", "minDateTime",new Date(e.target.value));
+                    });
+
+                    $(this.$el).find("#addActivityModal input[name='endDate']").datetimepicker({
+                            dateFormat: 'yy/mm/dd',
+                            controlType: "select"
+                    }).change((e) => {
+                        this.selectedActivity.inactiveTime = e.target.value;
+                    });
                },
                methods:{
                     bindDatepicker: function(){
@@ -625,8 +644,22 @@
 
                     },
                     selectActivity: function(activityInfo){
-                        this.selectedActivity = activityInfo;
+                        this.selectedActivity = {
+                            id: activityInfo.id,
+                            name: activityInfo.name,
+                            activityDate: activityInfo.activityDate,
+                            activityTime: activityInfo.activityTime,
+                            organizer: activityInfo.organizer,
+                            location: activityInfo.location
+                        };
+
                         this.isActivitySelected = true;
+
+                        let startTime = new Date(`${activityInfo.activityDate} ${activityInfo.activityTime}`);
+                        startTime.setHours(startTime.getHours() - 2); 
+
+                        $("#addActivityModal input[name='startDate']").datetimepicker("option", "minDate",startTime);
+                        $("#addActivityModal input[name='startDate']").datetimepicker("option", "minDateTime",startTime);
 
                         $("#selectActivityModal").modal("hide");
                     },
@@ -638,7 +671,7 @@
                         this.selectedActivity = {};
                         this.isActivitySelected = false;
 
-                        $("#selectActivityModal").modal("hide");
+                        $("#addActivityModal").modal("hide");
                     },
                     showJoinedInspector: function(activityId){
 
@@ -1103,8 +1136,8 @@
                                 <div class="input-group-prepend">
                                   <span class="input-group-text">驗票起迄時間</span>
                                 </div>
-                                <input name="startDate" type="text" class="form-control bg-light" autocomplete="off"/>
-                                <input name="endDate" type="text" class="form-control bg-light" autocomplete="off"/>
+                                <input name="startDate" type="text" class="form-control bg-light" autocomplete="off" v-model="selectedActivity.activeTime"/>
+                                <input name="endDate" type="text" class="form-control bg-light" autocomplete="off" v-model="selectedActivity.inactiveTime"/>
                             </div>
                         </div>
                     </div>
