@@ -160,7 +160,7 @@
                             inspectorId: "AEB01",
                             createTime: "2021/01/28 10:35",
                             status: "pass",
-                            bodyTemp: "36.9"
+                            bodyTemp: "36.7"
                         },
                         {
                             ticketNo: "ER20210128012",
@@ -169,7 +169,7 @@
                             inspectorId: "AEB03",
                             createTime: "2021/01/28 10:37",
                             status: "pass",
-                            bodyTemp: "36.9"
+                            bodyTemp: "36.1"
                         },
                         {
                             ticketNo: "ER20210128031",
@@ -178,7 +178,7 @@
                             inspectorId: "AEB04",
                             createTime: "2021/01/28 10:43",
                             status: "pass",
-                            bodyTemp: "36.9"
+                            bodyTemp: "35.9"
                         },
                         {
                             ticketNo: "ER20210128123",
@@ -187,16 +187,25 @@
                             inspectorId: "AEB01",
                             createTime: "2021/01/28 10:50",
                             status: "pass",
-                            bodyTemp: "36.9"
+                            bodyTemp: "36.3"
                         },
                         {
                             ticketNo: "ER20210128201",
                             activityTimeId: "198",
                             seat: "3排12號",
                             inspectorId: "AEB04",
-                            createTime: "2021/01/28 10:51",
-                            status: "pass",
-                            bodyTemp: "36.9"
+                            createTime: "2021/01/28 12:01",
+                            status: "manualPass",
+                            bodyTemp: "36.2"
+                        },
+                        {
+                            ticketNo: "ER20210128232",
+                            activityTimeId: "198",
+                            seat: "3排15號",
+                            inspectorId: "AEB04",
+                            createTime: "2021/01/28 12:02",
+                            status: "failed",
+                            bodyTemp: "36.7"
                         },
                     ];
 
@@ -331,7 +340,7 @@
                         return result;
                     },
                     getStatusName: function(statusCode){
-                        return statusCode == "pass" ? "成功" : "失敗";
+                        return statusCode == "pass" || statusCode == "manualPass" ? "成功" : "失敗";
                     }
                 }
            });
