@@ -14,6 +14,8 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
 
     <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js" crossorigin="anonymous"></script>
     
     <script src="/js/main.js"></script>
     <link rel="stylesheet" href="/css/main.css">
@@ -242,6 +244,73 @@
                         
 
                     },
+                    exportExcel: function(){
+                        var wb = XLSX.utils.book_new();
+                        wb.Props = {
+                                Title: "票券核銷",
+                                Subject: "核銷統計",
+                                Author: "Sam",
+                                CreatedDate: new Date()
+                        };
+                        
+
+                        var ws_name = "sheet1";
+
+                        /* make worksheet */
+                        let headerList = [""].concat(this.headerList);
+                        let mergeConfigList = [];
+
+                        var ws_data = [headerList];
+
+                        let rowNo = 1;
+
+                        this.filteredList.forEach((activityDetail,index) => {
+                            
+                            if(activityDetail.inspectResultList.length > 1){
+                                let rowExpend = activityDetail.inspectResultList.length - 1;
+                                mergeConfigList = mergeConfigList.concat([
+                                    {s: {r: rowNo, c: 0}, e: {r: rowNo + rowExpend, c: 0}},
+                                    {s: {r: rowNo, c: 1}, e: {r: rowNo + rowExpend, c: 1}},
+                                    {s: {r: rowNo, c: 2}, e: {r: rowNo + rowExpend, c: 2}},
+                                    {s: {r: rowNo, c: 3}, e: {r: rowNo + rowExpend, c: 3}},
+                                ]);
+                                console.log(mergeConfigList);
+                            }
+
+                            activityDetail.inspectResultList.forEach((inspectResult,inspectResultIndex) => {
+                                let rowData = [];
+
+                                rowData.push(inspectResultIndex == 0 ? index + 1 : "");
+                                rowData.push(inspectResultIndex == 0 ? activityDetail.name : "");
+                                rowData.push(inspectResultIndex == 0 ? `${activityDetail.activityDate} ${activityDetail.activityTime}` : "");
+                                rowData.push(inspectResultIndex == 0 ? activityDetail.location : "");
+                                rowData.push(`${this.getUserName(inspectResult.userId)}`);
+                                rowData.push(`${inspectResult.successCount}`);
+                                rowData.push(`${inspectResult.manualSuccessCount}`);
+                                ws_data.push(rowData);
+
+                                rowNo++;
+                            });
+
+                        });
+
+                        var ws = XLSX.utils.aoa_to_sheet(ws_data);
+                        ws["!merges"] = mergeConfigList;
+                        console.log("end : " + mergeConfigList);
+
+                        /* Add the worksheet to the workbook */
+                        XLSX.utils.book_append_sheet(wb, ws, ws_name);
+
+                        let now = new Date();
+                        let year = now.getFullYear();
+                        let month = `0${now.getMonth() + 1}`;
+                        month = month.substring(month.length - 2,month.length)
+
+                        let day = `0${now.getDate()}`;
+                        day = day.substring(day.length - 2,day.length)
+
+                        XLSX.writeFile(wb, `核銷統計${year}${month}${day}.xlsx`);
+                    },
                     getUserName: function(userId){
                         let name = "無效的使用者代碼";
 
@@ -256,7 +325,7 @@
                 }
            });
         });
-        
+
     </script>
 
 </head>
@@ -269,7 +338,7 @@
                 <breadcrumb :breadcrumblist="breadcrumbList"></breadcrumb>
                 <div class="card">
                     <div class="card-body">
-                        <div class="d-flex flex-row justify-content-between">
+                        <div class="d-flex flex-row">
                             <div class="input-group w-25 mb-3 mr-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">活動名稱</span>
@@ -301,6 +370,10 @@
                                 </select>
                             </div>
                             <button class="btn btn-primary mb-3" @click="query">查詢</button>
+                        </div>
+                        <hr/>
+                        <div class="d-flex flex-row-reverse">
+                            <button class="btn btn-success mb-3" @click="exportExcel">輸出Excel</button>
                         </div>
                         <div>
                             <table class="table table-striped table-bordered">
