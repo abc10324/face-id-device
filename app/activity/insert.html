@@ -12,28 +12,326 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
-    
+    <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>
+
     <script src="/js/main.js"></script>
+    <script src="/js/timepicker-addon.js"></script>
     <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/timepicker.css">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">    
-    
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.0/themes/smoothness/jquery-ui.css" crossorigin="anonymous">    
+
     <script>
         var app;
 
         $(document).ready(function () {
             app = new Vue({
-               el: "#app",
-               data:{
-                    breadcrumbList:[]
-               },
-               created(){
-                   this.breadcrumbList = [
-                       {name: "首頁",link: "/index.html"},
-                       {name: "活動管理",link: ""},
-                       {name: "建立活動",link: "/app/activity/insert.html"}
-                   ]
-               }
+                el: "#app",
+                data:{
+                    breadcrumbList:[],
+                    headerList:["活動名稱","活動類型","主辦單位","活動起訖","活動明細","編輯"],
+                    queryParam:{
+                        name: "",
+                        startDate: "",
+                        endDate: "",
+                        location: ""
+                    },
+                    formData: {
+                        organizerOption: [
+                            {
+                                name: "寬宏",
+                                value: "1"
+                            },
+                            {
+                                name: "UDN",
+                                value: "2"
+                            },
+                            {
+                                name: "KKTIX",
+                                value: "3"
+                            },
+                            {
+                                name: "兩廳院",
+                                value: "4"
+                            }
+                        ]
+                    },
+                    activityList:[],
+                    activityTimeList:[],
+                    filteredList:[],
+                    activityDetail:{},
+                    editTarget:{},
+                    activityTimeDetail:{},
+                    isEditMode: false
+                },
+                created(){
+                    this.breadcrumbList = [
+                        {name: "首頁",link: "/index.html"},
+                        {name: "活動管理",link: ""},
+                        {name: "建立活動",link: "/app/activity/insert.html"}
+                    ];
+
+                    this.activityList = [
+                        {
+                            id: "198",
+                            type: "娛樂",
+                            name: "海賊王電影特展",
+                            organizer: "1"
+                        },
+                        {
+                            id: "199",
+                            type: "娛樂",
+                            name: "翠玉白菜特展",
+                            organizer: "2"
+                        }
+                    ];
+
+                    this.activityTimeList = [
+                        {
+                            id: "101",
+                            activityId: "198",
+                            location: "秀泰影城",
+                            startTime: "2021/1/20 08:00",
+                            endTime: "2021/1/20 18:00",
+                        },
+                        {
+                            id: "102",
+                            activityId: "198",
+                            location: "威秀影城",
+                            startTime: "2021/1/21 08:00",
+                            endTime: "2021/1/21 18:00",
+                        },
+                        {
+                            id: "103",
+                            activityId: "198",
+                            location: "in98影城",
+                            startTime: "2021/1/22 08:00",
+                            endTime: "2021/1/22 18:00",
+                        },
+                        {
+                            id: "104",
+                            activityId: "198",
+                            location: "國賓影城",
+                            startTime: "2021/1/25 08:00",
+                            endTime: "2021/1/25 18:00",
+                        },
+                        {
+                            id: "105",
+                            activityId: "199",
+                            location: "故宮",
+                            startTime: "2021/1/25 10:00",
+                            endTime: "2021/1/29 18:00",
+                        },
+                        {
+                            id: "105",
+                            activityId: "199",
+                            location: "故宮南院",
+                            startTime: "2021/2/1 10:00",
+                            endTime: "2021/2/5 18:00",
+                        },
+                    ];
+
+                    this.filteredList = this.activityList;
+                },
+                mounted: function(){
+                    $("#activityDetailModal").on("hidden.bs.modal",(event) => {
+                        this.isEditMode = false;
+                    });
+                    $("#activityTimeDetailModal").on("hidden.bs.modal",(event) => {
+                        this.isEditMode = true;
+                        $("#activityDetailModal").modal("show");
+                    });
+
+                    $(this.$el).find("input[name='startDate']").datepicker({
+                        dateFormat: 'yy/mm/dd',
+                        minDate: new Date()
+                    }).change((e) => {
+                        this.queryParam.startDate = e.target.value;
+
+                        $("input[name='endDate']").datepicker("option", "minDate",new Date(e.target.value));
+                    });
+
+                    $(this.$el).find("input[name='endDate']").datepicker({
+                            dateFormat: 'yy/mm/dd'
+                    }).change((e) => {
+                        this.queryParam.endDate = e.target.value;
+                    });
+
+                    $(this.$el).find("input[name='startTime']").datetimepicker({
+                            dateFormat: 'yy/mm/dd',
+                            controlType: "select",
+                            minDate: new Date(),
+                            minDateTime: new Date()
+                    }).change((e) => {
+                        this.activityTimeDetail.startTime = e.target.value;
+
+                        $("input[name='endTime']").datetimepicker("option", "minDate",new Date(e.target.value));
+                        $("input[name='endTime']").datetimepicker("option", "minDateTime",new Date(e.target.value));
+                    });
+
+                    $(this.$el).find("input[name='endTime']").datetimepicker({
+                            dateFormat: 'yy/mm/dd',
+                            controlType: "select"
+                    }).change((e) => {
+                        this.activityTimeDetail.endTime = e.target.value;
+                    });
+                },
+                methods:{
+                    query: function(){
+                        
+                        this.filteredList = this.activityList;
+
+                        if(this.queryParam.name != ""){
+                            this.filteredList = this.filteredList.filter(activityDetail => activityDetail.name.indexOf(this.queryParam.name) != -1);
+                        }
+
+                        if(this.queryParam.location != ""){
+                            this.filteredList = this.filteredList.filter(activityDetail => activityDetail.location.indexOf(this.queryParam.location) != -1);
+                        }
+
+                        if(this.queryParam.startDate != ""){
+                            this.filteredList = this.filteredList.filter(activityDetail => {
+                                let activityTime = new Date(this.getDuration(activityDetail.id).startDate).getTime();
+                                let startTime = new Date(this.queryParam.startDate).getTime();
+
+                                return activityTime >= startTime;
+                            });
+                        }
+
+                        if(this.queryParam.endDate != ""){
+                            this.filteredList = this.filteredList.filter(activityDetail => {
+                                let activityTime = new Date(this.getDuration(activityDetail.id).endDate).getTime();
+                                let endTime = new Date(this.queryParam.endDate).getTime();
+
+                                return activityTime <= endTime;
+                            });
+                        }
+
+                    },
+                    getOrganizerName: function(organizer){
+                        let name = "無效的狀態";
+
+                        this.formData.organizerOption.forEach(element => {
+                            if(element.value == organizer){
+                                name = element.name;
+                            }
+                        });
+
+                        return name;
+                    },
+                    getDuration: function(activityId){
+                        let activityList = this.activityTimeList.filter(activityTimeObj => activityTimeObj.activityId == activityId);
+                        let startTimeMill = 0;
+                        let endTimeMill = 0;
+                        
+                        activityList.forEach((activityTimeObj) => {
+                            let currStartTimeMill = new Date(activityTimeObj.startTime).getTime();
+                            let currEndTimeMill = new Date(activityTimeObj.endTime).getTime();
+                        
+                            if(startTimeMill == 0 || currStartTimeMill < startTimeMill){
+                                startTimeMill = currStartTimeMill;
+                            }
+
+                            if(currEndTimeMill > endTimeMill){
+                                endTimeMill = currEndTimeMill;
+                            }
+                        });
+
+                        let startDate = new Date(startTimeMill).toLocaleDateString();
+                        let endDate = new Date(endTimeMill).toLocaleDateString();
+
+                        return {
+                            startDate: startDate, 
+                            endDate: endDate, 
+                            result: startDate == endDate ? startDate : `${startDate}~${endDate}`, 
+                        } ;
+                    },
+                    showActivityDetail: function(activityDetail){
+                        this.activityDetail = {
+                            id: activityDetail.id,
+                            type: activityDetail.type,
+                            name: activityDetail.name,
+                            organizer: activityDetail.organizer,
+                            activityTimeList: this.getActivityTimeList(activityDetail.id)
+                        };
+
+                        $("#activityDetailModal").modal("show");
+                    },
+                    getActivityTimeList: function(activityId){
+                        return this.activityTimeList.filter(activityTimeObj => activityTimeObj.activityId == activityId);
+                    },
+                    edit: function(activityDetail){
+                        this.activityDetail = {
+                            id: activityDetail.id,
+                            type: activityDetail.type,
+                            name: activityDetail.name,
+                            organizer: activityDetail.organizer,
+                            activityTimeList: this.getActivityTimeList(activityDetail.id)
+                        };
+
+                        this.isEditMode = true;
+
+                        this.editTarget = activityDetail;
+
+                        $("#activityDetailModal").modal("show");
+                    },
+                    del: function(activityDetail){
+                        this.activityList.splice(this.activityList.indexOf(activityDetail),1);
+
+                        this.activityTimeList = this.activityTimeList.filter(activityTimeObj => activityTimeObj.activityId != activityDetail.id);
+                    },
+                    delActivityTime: function(activityTimeDetail){
+                        this.activityDetail.activityTimeList.splice(this.activityDetail.activityTimeList.indexOf(activityTimeDetail),1);
+                    },
+                    showAddActivityTime: function(){
+                        $("#activityDetailModal").modal("hide");
+
+                        let maxId = 0;
+
+                        this.activityTimeList.forEach((activityTimeObj) => {
+                            let id = parseInt(activityTimeObj.id);
+                            
+                            if(id > maxId){
+                                maxId = id;
+                            }
+                        });
+
+                        this.activityTimeDetail.id = `${maxId + 1}`;
+                        this.activityTimeDetail.activityId = this.activityDetail.id;
+
+                        window.setTimeout(() => {
+                            $("#activityTimeDetailModal").modal("show");
+                            this.isEditMode = true;
+                        }, 400);
+                    },
+                    addActivityTime: function(){
+                        this.activityDetail.activityTimeList.push(this.activityTimeDetail);
+
+                        $("#activityTimeDetailModal").modal("hide");
+                    },
+                    saveEdit: function(){
+                        let editedActivity = {
+                            id: this.activityDetail.id,
+                            type: this.activityDetail.type,
+                            name: this.activityDetail.name,
+                            organizer: this.activityDetail.organizer
+                        }
+
+                        this.activityList.splice(this.activityList.indexOf(this.editTarget),1,editedActivity);
+
+                        this.activityTimeList.filter(activityTimeObj => activityTimeObj.activityId == editedActivity.id).forEach((activityTimeObj) => {
+                            this.activityTimeList.splice(this.activityTimeList.indexOf(activityTimeObj),1);
+                        });
+
+                        this.activityDetail.activityTimeList.forEach((activityTimeObj) => {
+                            this.activityTimeList.push(activityTimeObj);
+                        });
+
+                        $("#activityDetailModal").modal("hide");
+                    }
+
+                }
            });
         });
         
@@ -45,11 +343,229 @@
         <top-bar></top-bar>
         <div class="d-flex flex-row">
             <side-nav></side-nav>
-            <div class="w-75 p-2">
+            <div class="w-100 p-2">
                 <breadcrumb :breadcrumblist="breadcrumbList"></breadcrumb>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex flex-row">
+                            <div class="input-group w-25 mb-3 mr-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">活動名稱</span>
+                                </div>
+                                <input type="text" class="form-control" v-model="queryParam.name">
+                            </div>
+                            <div class="input-group w-25 mb-3 mr-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">活動時間</span>
+                                </div>
+                                <input name="startDate" type="text" class="form-control" autocomplete="off" v-model="queryParam.startDate">
+                                <input name="endDate" type="text" class="form-control" autocomplete="off" v-model="queryParam.endDate">
+                            </div>
+                            <div class="input-group w-20 mb-3 mr-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">活動地點</span>
+                                </div>
+                                <input  type="text" class="form-control" v-model="queryParam.location">
+                            </div>
+                            <button class="btn btn-primary mb-3" @click="query">查詢</button>
+                        </div>
+                        <hr/>
+                        <div>
+                            <table class="table table-striped table-bordered">
+                                <thead>
+                                  <tr>
+                                    <th scope="col">#</th>
+                                    <template v-for="header in headerList">
+                                        <th scope="col">{{header}}</th>
+                                    </template>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                    <template v-for="(activityDetail,index) in filteredList">
+                                        <tr>
+                                            <td>{{index + 1}}</td>
+                                            <td>{{activityDetail.name}}</td>
+                                            <td>{{activityDetail.type}}</td>
+                                            <td>{{getOrganizerName(activityDetail.organizer)}}</td>
+                                            <td>{{getDuration(activityDetail.id).result}}</td>
+                                            <td>
+                                                <button class="btn btn-primary" @click="showActivityDetail(activityDetail)">檢視明細</button>
+                                            </td>
+                                            <td>
+                                                <i class="fa fa-2x fa-pencil mr-2" aria-hidden="true" @click="edit(activityDetail)"></i>
+                                                <i class="fa fa-2x fa-trash" aria-hidden="true" @click="del(activityDetail)"></i>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                              </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="activityDetailModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                    <h5 v-if="isEditMode" class="modal-title">
+                        編輯活動明細
+                    </h5>
+                    <h5 v-else class="modal-title">
+                        檢視明細
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">活動名稱</span>
+                        </div>
+                        <input type="text" class="form-control bg-light" v-model="activityDetail.name" :disabled="!isEditMode">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">主辦單位</span>
+                        </div>
+                        <select class="form-control" v-model="activityDetail.organizer" :disabled="!isEditMode">
+                            <template v-for="option in formData.organizerOption">
+                                <option :value="option.value">{{option.name}}</option>
+                            </template>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">活動種類</span>
+                        </div>
+                        <input type="text" class="form-control bg-light" v-model="activityDetail.type" :disabled="!isEditMode">
+                    </div>
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            場次清單
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-striped table-bordered">
+                                <thead>
+                                  <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">場次時間</th>
+                                    <th scope="col">活動地點</th>
+                                    <th v-if="isEditMode" scope="col">編輯</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                    <template v-for="(activityTimeDetail,index) in activityDetail.activityTimeList">
+                                        <tr>
+                                            <th scope="row">{{index + 1}}</th>
+                                            <td>{{activityTimeDetail.startTime}} ~ {{activityTimeDetail.endTime}}</td>
+                                            <td>{{activityTimeDetail.location}}</td>
+                                            <td v-if="isEditMode">
+                                                <i class="fa fa-2x fa-trash" aria-hidden="true" @click="delActivityTime(activityTimeDetail)"></i>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                            <button v-if="isEditMode" class="btn btn-success btn-lg btn-block" @click="showAddActivityTime">新增場次</button>
+                        </div>
+                    </div>
+
+                    <button v-if="isEditMode" class="btn btn-primary btn-lg btn-block" @click="saveEdit">儲存變更</button>
+
+                </div>
+                
+              </div>
             </div>
         </div>
         
+        <div class="modal fade" id="activityTimeDetailModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        新增場次
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">開始時間</span>
+                        </div>
+                        <input name="startTime" type="text" class="form-control bg-light" autocomplete="off" v-model="activityTimeDetail.startTime" :disabled="!isEditMode">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">結束時間</span>
+                        </div>
+                        <input name="endTime" type="text" class="form-control bg-light" autocomplete="off" v-model="activityTimeDetail.endTime" :disabled="!isEditMode">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">活動地點</span>
+                        </div>
+                        <input type="text" class="form-control bg-light" v-model="activityTimeDetail.location" :disabled="!isEditMode">
+                    </div>
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            售票系統綁定清單
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-striped table-bordered">
+                                <thead>
+                                  <tr>
+                                    <th scope="col">名稱</th>
+                                    <th scope="col">綁定狀態</th>
+                                    <th v-if="isEditMode" scope="col">編輯</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>寬宏</td>
+                                        <td>未綁訂</td>
+                                        <td>
+                                            <button class="btn btn-primary">綁定</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>UDN</td>
+                                        <td>未綁訂</td>
+                                        <td>
+                                            <button class="btn btn-primary">綁定</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>兩廳院</td>
+                                        <td>已綁訂</td>
+                                        <td>
+                                            <button class="btn btn-danger">取消綁定</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>KKTIX</td>
+                                        <td>未綁訂</td>
+                                        <td>
+                                            <button class="btn btn-primary">綁定</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <button v-if="isEditMode" class="btn btn-primary btn-lg btn-block" @click="addActivityTime">儲存變更</button>
+
+                </div>
+                
+              </div>
+            </div>
+        </div>
+
    </div>
 </body>
 </html>

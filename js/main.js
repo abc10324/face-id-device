@@ -9,7 +9,7 @@ Vue.component('top-bar',{
                </div>`,
     data: function(){
         return {
-            title: "AI驗票機後台系統 v1.23"
+            title: "AI驗票機後台系統 v1.24"
         }
     }
 })
@@ -58,8 +58,8 @@ Vue.component('side-nav', {
                    title: "活動管理",
                    itemList: [
                        { name:"建立活動", link: "/app/activity/insert.html"},
-                       { name:"扣款明細", link: "/app/activity/detail.html"},
-                       { name:"請款報表", link: "/app/activity/report.html"}
+                    //    { name:"扣款明細", link: "/app/activity/detail.html"},
+                    //    { name:"請款報表", link: "/app/activity/report.html"}
                    ]
                },
                {

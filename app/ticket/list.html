@@ -60,7 +60,7 @@
                                 }
                             ]
                         },
-                        activityList: [],
+                        activityList:[],
                         filteredList: []
                 },
                 created(){
@@ -178,7 +178,6 @@
                         }
                     ]
 
-                    this.filteredList = this.activityList;
                 },
                 mounted: function(){
                     $(this.$el).find("input[name='startDate']").datepicker({
