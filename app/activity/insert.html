@@ -37,6 +37,11 @@
                         endDate: "",
                         location: ""
                     },
+                    systemQueryParam:{
+                        name: "",
+                        startDate: "",
+                        endDate: ""
+                    },
                     formData: {
                         organizerOption: [
                             {
@@ -57,13 +62,44 @@
                             }
                         ]
                     },
+                    systemList:[
+                        {
+                            id: "1",
+                            name: "寬宏"
+                        },
+                        {
+                            id: "2",
+                            name: "UDN"
+                        },
+                        {
+                            id: "3",
+                            name: "兩廳院"
+                        },
+                        {
+                            id: "4",
+                            name: "KKTIX"
+                        }
+                    ],
                     activityList:[],
                     activityTimeList:[],
                     filteredList:[],
+                    outerActivityList:[],
+                    filteredOuterActivityList:[],
                     activityDetail:{},
                     editTarget:{},
-                    activityTimeDetail:{},
-                    isEditMode: false
+                    activityTimeDetail:{
+                        id: "",
+                        startTime: "",
+                        endTime: "",
+                        location: "",
+                        systemList:[]    
+                    },
+                    selectedSystemId: "",
+                    selectedSystemName: "",
+                    isEditMode: false,
+                    isInsertMode: false,
+                    isEditTimeMode: false,
+                    isBindingActivity: false
                 },
                 created(){
                     this.breadcrumbList = [
@@ -94,6 +130,7 @@
                             location: "秀泰影城",
                             startTime: "2021/1/20 08:00",
                             endTime: "2021/1/20 18:00",
+                            systemList:[]
                         },
                         {
                             id: "102",
@@ -101,6 +138,7 @@
                             location: "威秀影城",
                             startTime: "2021/1/21 08:00",
                             endTime: "2021/1/21 18:00",
+                            systemList:[]
                         },
                         {
                             id: "103",
@@ -108,6 +146,7 @@
                             location: "in98影城",
                             startTime: "2021/1/22 08:00",
                             endTime: "2021/1/22 18:00",
+                            systemList:[]
                         },
                         {
                             id: "104",
@@ -115,6 +154,7 @@
                             location: "國賓影城",
                             startTime: "2021/1/25 08:00",
                             endTime: "2021/1/25 18:00",
+                            systemList:[]
                         },
                         {
                             id: "105",
@@ -122,6 +162,7 @@
                             location: "故宮",
                             startTime: "2021/1/25 10:00",
                             endTime: "2021/1/29 18:00",
+                            systemList:[]
                         },
                         {
                             id: "105",
@@ -129,18 +170,123 @@
                             location: "故宮南院",
                             startTime: "2021/2/1 10:00",
                             endTime: "2021/2/5 18:00",
+                            systemList:[]
                         },
                     ];
 
                     this.filteredList = this.activityList;
+
+                    this.outerActivityList = [
+                        {
+                            systemId: "1",
+                            name: "超級英雄展",
+                            location: "華山公園",
+                            startTime: "2021/1/19 11:00",
+                            endTime: "2021/1/19 18:00"
+                        },
+                        {
+                            systemId: "1",
+                            name: "超級火車展",
+                            location: "228公園",
+                            startTime: "2021/1/28 11:00",
+                            endTime: "2021/1/28 18:00"
+                        },
+                        {
+                            systemId: "1",
+                            name: "SBL季後賽第一場",
+                            location: "新莊體育館",
+                            startTime: "2021/7/15 15:00",
+                            endTime: "2021/7/15 18:00"
+                        },
+                        {
+                            systemId: "1",
+                            name: "2021旅展",
+                            location: "世貿一館",
+                            startTime: "2021/3/2 10:00",
+                            endTime: "2021/3/2 18:00"
+                        },
+                        {
+                            systemId: "1",
+                            name: "2021新車大展",
+                            location: "五股工商展覽館",
+                            startTime: "2021/12/28 10:00",
+                            endTime: "2021/12/28 10:00"
+                        },
+                        {
+                            systemId: "1",
+                            name: "海賊王電影特展",
+                            location: "威秀影城",
+                            startTime: "2021/1/21 08:00",
+                            endTime: "2021/1/21 18:00"
+                        },
+                        {
+                            systemId: "1",
+                            name: "翠玉白菜特展",
+                            location: "故宮",
+                            startTime: "2021/2/1 10:00",
+                            endTime: "2021/2/5 18:00"
+                        },
+                        {
+                            systemId: "2",
+                            name: "海賊王電影特展",
+                            location: "威秀影城",
+                            startTime: "2021/1/21 08:00",
+                            endTime: "2021/1/21 18:00"
+                        },
+                        {
+                            systemId: "2",
+                            name: "翠玉白菜特展",
+                            location: "故宮南院",
+                            startTime: "2021/2/1 10:00",
+                            endTime: "2021/2/5 18:00"
+                        },
+                        {
+                            systemId: "3",
+                            name: "翠玉白菜特展",
+                            location: "故宮南院",
+                            startTime: "2021/2/1 10:00",
+                            endTime: "2021/2/5 18:00"
+                        },
+                        {
+                            systemId: "4",
+                            name: "海賊王電影特展",
+                            location: "威秀影城",
+                            startTime: "2021/1/21 08:00",
+                            endTime: "2021/1/21 18:00"
+                        },
+                        {
+                            systemId: "4",
+                            name: "翠玉白菜特展",
+                            location: "故宮南院",
+                            startTime: "2021/2/1 10:00",
+                            endTime: "2021/2/5 18:00"
+                        },
+                        
+                    ];
+
+
+
+                    this.filteredOuterActivityList = this.outerActivityList;
                 },
                 mounted: function(){
                     $("#activityDetailModal").on("hidden.bs.modal",(event) => {
                         this.isEditMode = false;
+                        this.isInsertMode = false;
                     });
                     $("#activityTimeDetailModal").on("hidden.bs.modal",(event) => {
+                        if(this.isBindingActivity){
+                            $("#systemBindingModal").modal("show");
+                        } else {
+                            this.isEditMode = true;
+                            this.isEditTimeMode = false;
+                            $("#activityDetailModal").modal("show");
+                        }
+
+                    });
+                    $("#systemBindingModal").on("hidden.bs.modal",(event) => {
                         this.isEditMode = true;
-                        $("#activityDetailModal").modal("show");
+                        this.isBindingActivity = false;
+                        $("#activityTimeDetailModal").modal("show");
                     });
 
                     $(this.$el).find("input[name='startDate']").datepicker({
@@ -238,8 +384,8 @@
                             }
                         });
 
-                        let startDate = new Date(startTimeMill).toLocaleDateString();
-                        let endDate = new Date(endTimeMill).toLocaleDateString();
+                        let startDate = startTimeMill != 0 ? new Date(startTimeMill).toLocaleDateString() : "";
+                        let endDate = endTimeMill != 0 ? new Date(endTimeMill).toLocaleDateString() : "";
 
                         return {
                             startDate: startDate, 
@@ -261,6 +407,29 @@
                     getActivityTimeList: function(activityId){
                         return this.activityTimeList.filter(activityTimeObj => activityTimeObj.activityId == activityId);
                     },
+                    showAddActivityModal: function(){
+                        this.isInsertMode = true;
+
+                        let maxId = 0;
+
+                        this.activityList.forEach((activityDetail) => {
+                            let id = parseInt(activityDetail.id);
+                            
+                            if(id > maxId){
+                                maxId = id;
+                            }
+                        });
+
+
+                        this.activityDetail = {
+                            id: `${maxId + 1}`,
+                            type: "",
+                            name: "",
+                            organizer: "1"
+                        };
+
+                        $("#activityDetailModal").modal("show");
+                    },
                     edit: function(activityDetail){
                         this.activityDetail = {
                             id: activityDetail.id,
@@ -281,6 +450,24 @@
 
                         this.activityTimeList = this.activityTimeList.filter(activityTimeObj => activityTimeObj.activityId != activityDetail.id);
                     },
+                    showEditActivityTime: function(activityTimeDetail){
+                        $("#activityDetailModal").modal("hide");
+                        
+                        this.activityTimeDetail = {
+                            id: activityTimeDetail.id,
+                            activityId: activityTimeDetail.activityId,
+                            location: activityTimeDetail.location,
+                            startTime: activityTimeDetail.startTime,
+                            endTime: activityTimeDetail.endTime,
+                            systemList: activityTimeDetail.systemList
+                        }
+
+                        window.setTimeout(() => {
+                            $("#activityTimeDetailModal").modal("show");
+                            this.isEditTimeMode = true;
+                            this.isEditMode = true;
+                        }, 400);
+                    },
                     delActivityTime: function(activityTimeDetail){
                         this.activityDetail.activityTimeList.splice(this.activityDetail.activityTimeList.indexOf(activityTimeDetail),1);
                     },
@@ -299,16 +486,120 @@
 
                         this.activityTimeDetail.id = `${maxId + 1}`;
                         this.activityTimeDetail.activityId = this.activityDetail.id;
+                        this.activityTimeDetail.startTime = "";
+                        this.activityTimeDetail.endTime = "";
+                        this.activityTimeDetail.location = "";
+                        this.activityTimeDetail.systemList = [];
 
                         window.setTimeout(() => {
                             $("#activityTimeDetailModal").modal("show");
                             this.isEditMode = true;
                         }, 400);
                     },
-                    addActivityTime: function(){
-                        this.activityDetail.activityTimeList.push(this.activityTimeDetail);
+                    isBinding: function(targetSystemId){
+                        let result = false;
+
+                        this.activityTimeDetail.systemList.forEach((systemId) => {
+                            if(systemId == targetSystemId){
+                                result = true;
+                            }
+                        });
+
+                        return result;
+                    },
+                    editActivityTime: function(){
+                        let resultList = this.activityDetail
+                                             .activityTimeList
+                                             .filter(activityTimeObj => activityTimeObj.id == this.activityTimeDetail.id);
+
+                        if(resultList.length != 0){
+                            let editTarget = resultList[0];
+
+                            this.activityDetail.activityTimeList.splice(this.activityDetail.activityTimeList.indexOf(editTarget),1,this.activityTimeDetail);
+                        }
 
                         $("#activityTimeDetailModal").modal("hide");
+
+                    },
+                    addActivityTime: function(){
+                        let newActivityTime = {
+                            id: this.activityTimeDetail.id,
+                            activityId: this.activityTimeDetail.activityId,
+                            location: this.activityTimeDetail.location,
+                            startTime: this.activityTimeDetail.startTime,
+                            endTime: this.activityTimeDetail.endTime,
+                            systemList: this.activityTimeDetail.systemList
+                        };
+
+                        this.activityDetail.activityTimeList.push(newActivityTime);
+
+                        $("#activityTimeDetailModal").modal("hide");
+                    },
+                    showSystemBindingModal: function(systemId){
+                        this.isBindingActivity = true;
+
+                        let systemName = "";
+
+                        this.systemList.forEach((systemInfo) => {
+                            if(systemInfo.id == systemId){
+                                systemName = systemInfo.name;
+                            }
+                        });
+
+                        this.selectedSystemId = systemId;
+                        this.selectedSystemName = systemName;
+
+                        this.systemQueryParam.startTime = this.activityTimeDetail.startTime;
+                        this.systemQueryParam.endTime = this.activityTimeDetail.endTime;
+
+                        this.systemQuery();
+
+                        $("#activityTimeDetailModal").modal("hide");
+
+                    },
+                    selectBindingActivity: function(){
+                        // binding through API
+
+                        this.activityTimeDetail.systemList.push(this.selectedSystemId);
+
+                        $("#systemBindingModal").modal("hide");
+                    },
+                    delSystemBinding: function(systemId){
+                        this.activityTimeDetail.systemList.splice(this.activityTimeDetail.systemList.indexOf(systemId),1)
+                    },
+                    systemQuery: function(){
+                        this.filteredOuterActivityList = this.outerActivityList;
+
+                        if(this.selectedSystemId != ""){
+                            this.filteredOuterActivityList = this.filteredOuterActivityList.filter(activityDetail => activityDetail.systemId == this.selectedSystemId);
+                        }
+
+                        if(this.systemQueryParam.name != ""){
+                            this.filteredOuterActivityList = this.filteredOuterActivityList.filter(activityDetail => activityDetail.name.indexOf(this.systemQueryParam.name) != -1);
+                        }
+
+                        if(this.systemQueryParam.startTime != ""){
+                            this.filteredOuterActivityList = this.filteredOuterActivityList.filter(activityDetail => {
+                                let activityTime = new Date(activityDetail.startTime).getTime();
+                                let startTime = new Date(this.systemQueryParam.startTime).getTime();
+
+                                return activityTime >= startTime;
+                            });
+                        }
+
+                        if(this.systemQueryParam.endTime != ""){
+                            this.filteredOuterActivityList = this.filteredOuterActivityList.filter(activityDetail => {
+                                let activityTime = new Date(activityDetail.endTime).getTime();
+                                let endTime = new Date(this.systemQueryParam.endTime).getTime();
+
+                                return activityTime <= endTime;
+                            });
+                        }
+
+                    },
+                    addActivity: function(){
+                        this.activityList.push(this.activityDetail);
+                        $("#activityDetailModal").modal("hide");
                     },
                     saveEdit: function(){
                         let editedActivity = {
@@ -347,27 +638,32 @@
                 <breadcrumb :breadcrumblist="breadcrumbList"></breadcrumb>
                 <div class="card">
                     <div class="card-body">
-                        <div class="d-flex flex-row">
-                            <div class="input-group w-25 mb-3 mr-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">活動名稱</span>
+                        <div class="d-flex flex-row justify-content-between">
+                            <div class="d-flex flex-row w-90">
+                                <div class="input-group w-25 mb-3 mr-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">活動名稱</span>
+                                    </div>
+                                    <input type="text" class="form-control" v-model="queryParam.name">
                                 </div>
-                                <input type="text" class="form-control" v-model="queryParam.name">
-                            </div>
-                            <div class="input-group w-25 mb-3 mr-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">活動時間</span>
+                                <div class="input-group w-25 mb-3 mr-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">活動時間</span>
+                                    </div>
+                                    <input name="startDate" type="text" class="form-control" autocomplete="off" v-model="queryParam.startDate">
+                                    <input name="endDate" type="text" class="form-control" autocomplete="off" v-model="queryParam.endDate">
                                 </div>
-                                <input name="startDate" type="text" class="form-control" autocomplete="off" v-model="queryParam.startDate">
-                                <input name="endDate" type="text" class="form-control" autocomplete="off" v-model="queryParam.endDate">
-                            </div>
-                            <div class="input-group w-20 mb-3 mr-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">活動地點</span>
+                                <div class="input-group w-20 mb-3 mr-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">活動地點</span>
+                                    </div>
+                                    <input  type="text" class="form-control" v-model="queryParam.location">
                                 </div>
-                                <input  type="text" class="form-control" v-model="queryParam.location">
+                                <button class="btn btn-primary mb-3" @click="query">查詢</button>
                             </div>
-                            <button class="btn btn-primary mb-3" @click="query">查詢</button>
+                            <div>
+                                <button class="btn btn-primary" @click="showAddActivityModal">新增</button>
+                            </div>
                         </div>
                         <hr/>
                         <div>
@@ -398,7 +694,7 @@
                                         </tr>
                                     </template>
                                 </tbody>
-                              </table>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -424,13 +720,13 @@
                         <div class="input-group-prepend">
                           <span class="input-group-text w-th">活動名稱</span>
                         </div>
-                        <input type="text" class="form-control bg-light" v-model="activityDetail.name" :disabled="!isEditMode">
+                        <input type="text" class="form-control bg-light" v-model="activityDetail.name" :disabled="!isEditMode && !isInsertMode">
                     </div>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                           <span class="input-group-text w-th">主辦單位</span>
                         </div>
-                        <select class="form-control" v-model="activityDetail.organizer" :disabled="!isEditMode">
+                        <select class="form-control" v-model="activityDetail.organizer" :disabled="!isEditMode && !isInsertMode">
                             <template v-for="option in formData.organizerOption">
                                 <option :value="option.value">{{option.name}}</option>
                             </template>
@@ -440,9 +736,9 @@
                         <div class="input-group-prepend">
                           <span class="input-group-text w-th">活動種類</span>
                         </div>
-                        <input type="text" class="form-control bg-light" v-model="activityDetail.type" :disabled="!isEditMode">
+                        <input type="text" class="form-control bg-light" v-model="activityDetail.type" :disabled="!isEditMode && !isInsertMode">
                     </div>
-                    <div class="card mb-3">
+                    <div v-if="!isInsertMode" class="card mb-3">
                         <div class="card-header">
                             場次清單
                         </div>
@@ -463,6 +759,7 @@
                                             <td>{{activityTimeDetail.startTime}} ~ {{activityTimeDetail.endTime}}</td>
                                             <td>{{activityTimeDetail.location}}</td>
                                             <td v-if="isEditMode">
+                                                <i class="fa fa-2x fa-pencil mr-2" aria-hidden="true" @click="showEditActivityTime(activityTimeDetail)"></i>
                                                 <i class="fa fa-2x fa-trash" aria-hidden="true" @click="delActivityTime(activityTimeDetail)"></i>
                                             </td>
                                         </tr>
@@ -474,6 +771,7 @@
                     </div>
 
                     <button v-if="isEditMode" class="btn btn-primary btn-lg btn-block" @click="saveEdit">儲存變更</button>
+                    <button v-if="isInsertMode" class="btn btn-primary btn-lg btn-block" @click="addActivity">新增活動</button>
 
                 </div>
                 
@@ -525,40 +823,94 @@
                                   </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>寬宏</td>
-                                        <td>未綁訂</td>
-                                        <td>
-                                            <button class="btn btn-primary">綁定</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>UDN</td>
-                                        <td>未綁訂</td>
-                                        <td>
-                                            <button class="btn btn-primary">綁定</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>兩廳院</td>
-                                        <td>已綁訂</td>
-                                        <td>
-                                            <button class="btn btn-danger">取消綁定</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>KKTIX</td>
-                                        <td>未綁訂</td>
-                                        <td>
-                                            <button class="btn btn-primary">綁定</button>
-                                        </td>
-                                    </tr>
+                                    <template v-for="system in systemList">
+                                        <tr>
+                                            <td>{{system.name}}</td>
+                                            <td>
+                                                <template v-if="isBinding(system.id)">
+                                                    綁定
+                                                </template>
+                                                <template v-else>
+                                                    未綁定
+                                                </template>
+                                            </td>
+                                            <td>
+                                                <button v-if="isBinding(system.id)" class="btn btn-danger" @click="delSystemBinding(system.id)">取消綁定</button>
+                                                <button v-else class="btn btn-primary" @click="showSystemBindingModal(system.id)">綁定</button>
+                                            </td>
+                                        </tr>
+                                    </template>
                                 </tbody>
                             </table>
                         </div>
                     </div>
 
-                    <button v-if="isEditMode" class="btn btn-primary btn-lg btn-block" @click="addActivityTime">儲存變更</button>
+                    <button v-if="isEditTimeMode" class="btn btn-primary btn-lg btn-block" @click="editActivityTime">儲存變更</button>
+                    <button v-else class="btn btn-primary btn-lg btn-block" @click="addActivityTime">新增場次</button>
+
+                </div>
+                
+              </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="systemBindingModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        {{selectedSystemName}} 售票系統活動選擇
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex flex-row">
+                        <div class="input-group w-25 mb-3 mr-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">活動名稱</span>
+                            </div>
+                            <input type="text" class="form-control" v-model="systemQueryParam.name">
+                        </div>
+                        <div class="input-group w-50 mb-3 mr-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">活動時間</span>
+                            </div>
+                            <input type="text" class="form-control" autocomplete="off" v-model="systemQueryParam.startTime" readonly>
+                            <input type="text" class="form-control" autocomplete="off" v-model="systemQueryParam.endTime" readonly>
+                        </div>
+                        <button class="btn btn-primary mb-3" @click="systemQuery">查詢</button>
+                    </div>
+
+                    <div>
+                        <table class="table table-striped table-bordered">
+                            <thead>
+                              <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">活動名稱</th>
+                                <th scope="col">活動地點</th>
+                                <th scope="col">開始時間</th>
+                                <th scope="col">結束時間</th>
+                                <th scope="col">選擇</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                                <template v-for="(activityDetail,index) in filteredOuterActivityList">
+                                    <tr>
+                                        <td>{{index + 1}}</td>
+                                        <td>{{activityDetail.name}}</td>
+                                        <td>{{activityDetail.location}}</td>
+                                        <td>{{activityDetail.startTime}}</td>
+                                        <td>{{activityDetail.endTime}}</td>
+                                        <td>
+                                            <button class="btn btn-primary" @click="selectBindingActivity">選擇活動</button>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
 
                 </div>
                 
