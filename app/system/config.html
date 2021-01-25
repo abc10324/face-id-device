@@ -25,15 +25,210 @@
             app = new Vue({
                el: "#app",
                data:{
-                    breadcrumbList:[]
-               },
-               created(){
-                   this.breadcrumbList = [
-                       {name: "首頁",link: "/index.html"},
-                       {name: "系統管理",link: ""},
-                       {name: "系統參數維護",link: "/app/system/config.html"}
-                   ]
-               }
+                    breadcrumbList:[],
+                    headerList:[
+                        "群組名稱","類型","值","畫面顯示值","編輯"
+                    ],
+                    queryParam:{
+                        group: "all",
+                        type: "all"
+                    },
+                    groupOption:[
+                        {
+                            name: "權限控管",
+                            value: "accessControl"
+                        },
+                        {
+                            name: "活動",
+                            value: "activity"
+                        },
+                        {
+                            name: "活動票券",
+                            value: "activityTicket"
+                        },
+                        {
+                            name: "驗票機",
+                            value: "device"
+                        },
+                        {
+                            name: "訂單",
+                            value: "order"
+                        },
+                    ],
+                    typeOption:[
+                        {
+                            group: "accessControl",
+                            name: "功能",
+                            value: "function"
+                        },
+                        {
+                            group: "activity",
+                            name: "種類",
+                            value: "type"
+                        },
+                        {
+                            group: "activity",
+                            name: "售票方式",
+                            value: "sale_mode"
+                        },
+                        {
+                            group: "activity",
+                            name: "主辦單位",
+                            value: "organizer"
+                        },
+                        {
+                            group: "activity",
+                            name: "場館位置",
+                            value: "location"
+                        },
+                        {
+                            group: "activityTicket",
+                            name: "種類",
+                            value: "type"
+                        },
+                        {
+                            group: "activityTicket",
+                            name: "付款方式",
+                            value: "pay_type"
+                        },
+                        {
+                            group: "device",
+                            name: "種類",
+                            value: "type"
+                        },
+                        {
+                            group: "device",
+                            name: "型號",
+                            value: "model"
+                        },
+                        {
+                            group: "order",
+                            name: "可用功能",
+                            value: "function"
+                        },
+                        {
+                            group: "order",
+                            name: "可用售票系統",
+                            value: "system"
+                        },
+                    ],
+                    configList:[],
+                    filteredList:[]
+                },
+                created(){
+                    this.breadcrumbList = [
+                        {name: "首頁",link: "/index.html"},
+                        {name: "系統管理",link: ""},
+                        {name: "系統參數維護",link: "/app/system/config.html"}
+                    ];
+
+                    this.configList = [
+                        {
+                            type: "activity",
+                            key: "type",
+                            value: "movie",
+                            showValue: "電影"
+                        },
+                        {
+                            type: "activity",
+                            key: "type",
+                            value: "exhibition",
+                            showValue: "展覽"
+                        },
+                        {
+                            type: "activity",
+                            key: "type",
+                            value: "outdoor",
+                            showValue: "戶外活動"
+                        },
+                        {
+                            type: "activity",
+                            key: "sale_mode",
+                            value: "online",
+                            showValue: "線上售票"
+                        },
+                        {
+                            type: "activity",
+                            key: "sale_mode",
+                            value: "on-site",
+                            showValue: "現場售票"
+                        },
+                        {
+                            type: "activityTicket",
+                            key: "type",
+                            value: "easy-card",
+                            showValue: "悠遊卡"
+                        },
+                        {
+                            type: "activityTicket",
+                            key: "type",
+                            value: "ipass",
+                            showValue: "一卡通"
+                        },
+                    ];
+
+                    this.filteredList = this.configList;
+                },
+                methods:{
+                    query: function(){
+                        this.filteredList = this.configList;
+
+                        if(this.queryParam.group != "all"){
+                            this.filteredList = this.filteredList.filter((config) => config.type == this.queryParam.group);
+                        }
+
+                        if(this.queryParam.type != "all"){
+                            this.filteredList = this.filteredList.filter((config) => config.key == this.queryParam.type);
+                        }
+
+                    },
+                    showConfigModal: function(){
+
+                    },
+                    getGroupName: function(group){
+                        let groupName = "無效的名稱";
+
+                        this.groupOption.forEach(opt => {
+                            if(opt.value == group){
+                                groupName = opt.name;
+                            }
+                        });
+
+                        return groupName;
+                    },
+                    getTypeName: function(group,type){
+                        let typeName = "無效的名稱";
+
+                        this.typeOption.forEach(opt => {
+                            if(opt.group == group && opt.value == type){
+                                typeName = opt.name;
+                            }
+                        });
+
+                        return typeName;
+                    },
+                    edit: function(config){
+
+                    },
+                    del: function(config){
+                        this.configList.splice(this.configList.indexOf(config),1);
+                    }
+                },
+                computed:{
+                    getTypeOption: function(){
+                        this.queryParam.type = "all";
+
+                        let typeOptionList = [];
+
+                        if(this.queryParam.group == "all"){
+                            typeOptionList = this.typeOption;
+                        } else {
+                            typeOptionList = this.typeOption.filter(typeInfo => typeInfo.group == this.queryParam.group);
+                        }
+
+                        return typeOptionList;
+                    }
+                }
            });
         });
         
@@ -45,8 +240,70 @@
         <top-bar></top-bar>
         <div class="d-flex flex-row">
             <side-nav></side-nav>
-            <div class="w-75 p-2">
+            <div class="w-100 p-2">
                 <breadcrumb :breadcrumblist="breadcrumbList"></breadcrumb>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex flex-row justify-content-between">
+                            <div class="d-flex flex-row w-90">
+                                <div class="input-group w-20 mb-3 mr-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">群組名稱</span>
+                                    </div>
+                                    <select class="form-control" v-model="queryParam.group">
+                                        <option value="all">全部</option>
+                                        <template v-for="option in groupOption">
+                                            <option :value="option.value">{{option.name}}</option>
+                                        </template>
+                                    </select>
+                                </div>
+                                <div class="input-group w-20 mb-3 mr-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">類型</span>
+                                    </div>
+                                    <select class="form-control" v-model="queryParam.type">
+                                        <option value="all">全部</option>
+                                        <template v-for="option in getTypeOption">
+                                            <option :value="option.value">{{option.name}}</option>
+                                        </template>
+                                    </select>
+                                </div>
+                                <button class="btn btn-primary mb-3" @click="query">查詢</button>
+                            </div>
+                            <div>
+                                <button class="btn btn-primary" @click="showConfigModal">新增</button>
+                            </div>
+                        </div>
+                        <hr/>
+                        <div>
+                            <table class="table table-striped table-bordered">
+                                <thead>
+                                  <tr>
+                                    <th scope="col">#</th>
+                                    <template v-for="header in headerList">
+                                        <th scope="col">{{header}}</th>
+                                    </template>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                    <template v-for="(config,index) in filteredList">
+                                        <tr>
+                                            <td>{{index + 1}}</td>
+                                            <td>{{getGroupName(config.type)}}</td>
+                                            <td>{{getTypeName(config.type,config.key)}}</td>
+                                            <td>{{config.value}}</td>
+                                            <td>{{config.showValue}}</td>
+                                            <td>
+                                                <i class="fa fa-2x fa-pencil mr-2" aria-hidden="true" @click="edit(config)"></i>
+                                                <i class="fa fa-2x fa-trash" aria-hidden="true" @click="del(config)"></i>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         

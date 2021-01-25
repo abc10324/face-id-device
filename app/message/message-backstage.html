@@ -23,17 +23,22 @@
 
         $(document).ready(function () {
             app = new Vue({
-               el: "#app",
-               data:{
+                el: "#app",
+                data:{
                     breadcrumbList:[]
-               },
-               created(){
-                   this.breadcrumbList = [
-                       {name: "首頁",link: "/index.html"},
-                       {name: "訊息管理",link: ""},
-                       {name: "訊息投放後台",link: "/app/message/message-backstage.html"}
-                   ]
-               }
+                },
+                created(){
+                    this.breadcrumbList = [
+                        {name: "首頁",link: "/index.html"},
+                        {name: "訊息管理",link: ""},
+                        {name: "訊息投放後台",link: "/app/message/message-backstage.html"}
+                    ]
+                },
+                methods:{
+                    newWindow: function(){
+                        window.open("https://www.google.com");
+                    }
+                }
            });
         });
         
@@ -45,8 +50,9 @@
         <top-bar></top-bar>
         <div class="d-flex flex-row">
             <side-nav></side-nav>
-            <div class="w-75 p-2">
+            <div class="w-100 p-2">
                 <breadcrumb :breadcrumblist="breadcrumbList"></breadcrumb>
+                <button class="btn btn-primary btn-lg btn-block" @click="newWindow">跳轉至訊息投放後台</button>
             </div>
         </div>
         

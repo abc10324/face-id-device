@@ -9,7 +9,7 @@ Vue.component('top-bar',{
                </div>`,
     data: function(){
         return {
-            title: "AI驗票機後台系統 v1.25"
+            title: "AI驗票機後台系統 v1.26"
         }
     }
 })
