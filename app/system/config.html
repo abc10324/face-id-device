@@ -27,13 +27,13 @@
                data:{
                     breadcrumbList:[],
                     headerList:[
-                        "群組名稱","類型","值","畫面顯示值","編輯"
+                        "參數種類","參數類型","參數群組","參數值","描述","啟用狀態","編輯"
                     ],
                     queryParam:{
-                        group: "all",
-                        type: "all"
+                        category: "all",
+                        group: "all"
                     },
-                    groupOption:[
+                    categoryOption:[
                         {
                             name: "權限控管",
                             value: "accessControl"
@@ -55,65 +55,75 @@
                             value: "order"
                         },
                     ],
-                    typeOption:[
+                    groupOption:[
                         {
-                            group: "accessControl",
+                            category: "accessControl",
                             name: "功能",
                             value: "function"
                         },
                         {
-                            group: "activity",
+                            category: "activity",
                             name: "種類",
                             value: "type"
                         },
                         {
-                            group: "activity",
+                            category: "activity",
                             name: "售票方式",
                             value: "sale_mode"
                         },
                         {
-                            group: "activity",
+                            category: "activity",
                             name: "主辦單位",
                             value: "organizer"
                         },
                         {
-                            group: "activity",
+                            category: "activity",
                             name: "場館位置",
                             value: "location"
                         },
                         {
-                            group: "activityTicket",
+                            category: "activityTicket",
                             name: "種類",
                             value: "type"
                         },
                         {
-                            group: "activityTicket",
+                            category: "activityTicket",
                             name: "付款方式",
                             value: "pay_type"
                         },
                         {
-                            group: "device",
+                            category: "device",
                             name: "種類",
                             value: "type"
                         },
                         {
-                            group: "device",
+                            category: "device",
                             name: "型號",
                             value: "model"
                         },
                         {
-                            group: "order",
+                            category: "order",
                             name: "可用功能",
                             value: "function"
                         },
                         {
-                            group: "order",
+                            category: "order",
                             name: "可用售票系統",
                             value: "system"
                         },
                     ],
                     configList:[],
-                    filteredList:[]
+                    filteredList:[],
+                    isEditMode:false,
+                    editTarget:{},
+                    configDetail:{
+                        type: "normal",
+                        category: "accessControl",
+                        group: "function",
+                        value: "",
+                        description: "",
+                        status: "active"
+                    }
                 },
                 created(){
                     this.breadcrumbList = [
@@ -124,110 +134,196 @@
 
                     this.configList = [
                         {
-                            type: "activity",
-                            key: "type",
+                            type: "normal",
+                            category: "activity",
+                            group: "type",
                             value: "movie",
-                            showValue: "電影"
+                            description: "電影",
+                            status: "active"
                         },
                         {
-                            type: "activity",
-                            key: "type",
+                            type: "normal",
+                            category: "activity",
+                            group: "type",
                             value: "exhibition",
-                            showValue: "展覽"
+                            description: "展覽",
+                            status: "active"
                         },
                         {
-                            type: "activity",
-                            key: "type",
+                            type: "normal",
+                            category: "activity",
+                            group: "type",
                             value: "outdoor",
-                            showValue: "戶外活動"
+                            description: "戶外活動",
+                            status: "active"
                         },
                         {
-                            type: "activity",
-                            key: "sale_mode",
+                            type: "normal",
+                            category: "activity",
+                            group: "sale_mode",
                             value: "online",
-                            showValue: "線上售票"
+                            description: "線上售票",
+                            status: "active"
                         },
                         {
-                            type: "activity",
-                            key: "sale_mode",
+                            type: "normal",
+                            category: "activity",
+                            group: "sale_mode",
                             value: "on-site",
-                            showValue: "現場售票"
+                            description: "現場售票",
+                            status: "active"
                         },
                         {
-                            type: "activityTicket",
-                            key: "type",
+                            type: "normal",
+                            category: "activityTicket",
+                            group: "type",
                             value: "easy-card",
-                            showValue: "悠遊卡"
+                            description: "悠遊卡",
+                            status: "active"
                         },
                         {
-                            type: "activityTicket",
-                            key: "type",
+                            type: "normal",
+                            category: "activityTicket",
+                            group: "type",
                             value: "ipass",
-                            showValue: "一卡通"
+                            description: "一卡通",
+                            status: "active"
                         },
                     ];
 
                     this.filteredList = this.configList;
                 },
+                mounted: function(){
+                    $("#configModal").on("hidden.bs.modal",(event) => {
+                        this.isEditMode = false;
+                    });
+                },
                 methods:{
                     query: function(){
                         this.filteredList = this.configList;
 
-                        if(this.queryParam.group != "all"){
-                            this.filteredList = this.filteredList.filter((config) => config.type == this.queryParam.group);
+                        if(this.queryParam.category != "all"){
+                            this.filteredList = this.filteredList.filter((config) => config.category == this.queryParam.category);
                         }
 
-                        if(this.queryParam.type != "all"){
-                            this.filteredList = this.filteredList.filter((config) => config.key == this.queryParam.type);
+                        if(this.queryParam.group != "all"){
+                            this.filteredList = this.filteredList.filter((config) => config.group == this.queryParam.group);
                         }
 
                     },
                     showConfigModal: function(){
+                        this.configDetail = {
+                            type: "normal",
+                            category: "accessControl",
+                            group: "function",
+                            value: "",
+                            description: "",
+                            status: "active"
+                        };
 
+                        $("#configModal").modal("show");
                     },
-                    getGroupName: function(group){
+                    getTypeName: function(type){
+                        let typeName = "無效的名稱";
+
+                        if(type == "normal"){
+                            typeName = "一般";
+                        } else if(type == "system"){
+                            typeName = "系統";
+                        }
+
+                        return typeName;
+                    },
+                    getCategoryName: function(category){
+                        let categoryName = "無效的名稱";
+
+                        this.categoryOption.forEach(opt => {
+                            if(opt.value == category){
+                                categoryName = opt.name;
+                            }
+                        });
+
+                        return categoryName;
+                    },
+                    getGroupName: function(category,group){
                         let groupName = "無效的名稱";
 
                         this.groupOption.forEach(opt => {
-                            if(opt.value == group){
+                            if(opt.category == category && opt.value == group){
                                 groupName = opt.name;
                             }
                         });
 
                         return groupName;
                     },
-                    getTypeName: function(group,type){
-                        let typeName = "無效的名稱";
+                    getStatusName: function(status){
+                        let statusName = "無效的狀態";
 
-                        this.typeOption.forEach(opt => {
-                            if(opt.group == group && opt.value == type){
-                                typeName = opt.name;
-                            }
-                        });
+                        if(status == "active"){
+                            statusName = "啟用";
+                        } else if(status == "inactive"){
+                            statusName = "未啟用";
+                        }
 
-                        return typeName;
+                        return statusName;
                     },
                     edit: function(config){
+                        this.editTarget = config;
 
+                        this.isEditMode = true;
+
+                        this.configDetail = {
+                            type: config.type,
+                            category: config.category,
+                            group: config.group,
+                            value: config.value,
+                            description: config.description,
+                            status: config.status
+                        };
+
+                        $("#configModal").modal("show");
+                    },
+                    saveEdit: function(){
+                        this.configList.splice(this.configList.indexOf(this.editTarget),1,this.configDetail);
+                        $("#configModal").modal("hide");
+                    },
+                    addConfig: function(){
+                        let newConfig = {
+                            type: this.configDetail.type,
+                            category: this.configDetail.category,
+                            group: this.configDetail.group,
+                            value: this.configDetail.value,
+                            description: this.configDetail.description,
+                            status: this.configDetail.status
+                        };
+
+                        this.configList.push(newConfig);
+                        $("#configModal").modal("hide");
                     },
                     del: function(config){
                         this.configList.splice(this.configList.indexOf(config),1);
                     }
                 },
                 computed:{
-                    getTypeOption: function(){
-                        this.queryParam.type = "all";
+                    getGroupOption: function(){
+                        this.queryParam.group = "all";
 
-                        let typeOptionList = [];
+                        let groupOptionList = [];
 
-                        if(this.queryParam.group == "all"){
-                            typeOptionList = this.typeOption;
+                        if(this.queryParam.category == "all"){
+                            groupOptionList = this.groupOption;
                         } else {
-                            typeOptionList = this.typeOption.filter(typeInfo => typeInfo.group == this.queryParam.group);
+                            groupOptionList = this.groupOption.filter(groupInfo => groupInfo.category == this.queryParam.category);
                         }
 
-                        return typeOptionList;
-                    }
+                        return groupOptionList;
+                    },
+                    getEditGroupOption: function(){
+                        let groupOptionList = this.groupOption.filter(groupInfo => groupInfo.category == this.configDetail.category);
+                        this.configDetail.group = groupOptionList[0].value;
+
+                        return groupOptionList;
+                    },
                 }
            });
         });
@@ -250,9 +346,9 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">群組名稱</span>
                                     </div>
-                                    <select class="form-control" v-model="queryParam.group">
+                                    <select class="form-control" v-model="queryParam.category">
                                         <option value="all">全部</option>
-                                        <template v-for="option in groupOption">
+                                        <template v-for="option in categoryOption">
                                             <option :value="option.value">{{option.name}}</option>
                                         </template>
                                     </select>
@@ -261,9 +357,9 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">類型</span>
                                     </div>
-                                    <select class="form-control" v-model="queryParam.type">
+                                    <select class="form-control" v-model="queryParam.group">
                                         <option value="all">全部</option>
-                                        <template v-for="option in getTypeOption">
+                                        <template v-for="option in getGroupOption">
                                             <option :value="option.value">{{option.name}}</option>
                                         </template>
                                     </select>
@@ -289,10 +385,12 @@
                                     <template v-for="(config,index) in filteredList">
                                         <tr>
                                             <td>{{index + 1}}</td>
-                                            <td>{{getGroupName(config.type)}}</td>
-                                            <td>{{getTypeName(config.type,config.key)}}</td>
+                                            <td>{{getTypeName(config.type)}}</td>
+                                            <td>{{getCategoryName(config.category)}}</td>
+                                            <td>{{getGroupName(config.category,config.group)}}</td>
                                             <td>{{config.value}}</td>
-                                            <td>{{config.showValue}}</td>
+                                            <td>{{config.description}}</td>
+                                            <td>{{getStatusName(config.status)}}</td>
                                             <td>
                                                 <i class="fa fa-2x fa-pencil mr-2" aria-hidden="true" @click="edit(config)"></i>
                                                 <i class="fa fa-2x fa-trash" aria-hidden="true" @click="del(config)"></i>
@@ -307,6 +405,80 @@
             </div>
         </div>
         
+        <div class="modal fade" id="configModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                    <h5 v-if="isEditMode" class="modal-title">
+                        編輯參數設定
+                    </h5>
+                    <h5 v-else class="modal-title">
+                        新增參數設定
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">參數種類</span>
+                        </div>
+                        <select class="form-control" v-model="configDetail.type" :disabled="isEditMode">
+                            <option value="normal">一般</option>
+                            <option value="system">系統</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">參數類型</span>
+                        </div>
+                        <select class="form-control" v-model="configDetail.category" :disabled="isEditMode">
+                            <template v-for="option in categoryOption">
+                                <option :value="option.value">{{option.name}}</option>
+                            </template>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">參數種類</span>
+                        </div>
+                        <select class="form-control" v-model="configDetail.group" :disabled="isEditMode">
+                            <template v-for="option in getEditGroupOption">
+                                <option :value="option.value">{{option.name}}</option>
+                            </template>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">參數值</span>
+                        </div>
+                        <input type="text" class="form-control bg-light" v-model="configDetail.value">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">描述</span>
+                        </div>
+                        <input type="text" class="form-control bg-light" v-model="configDetail.description">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text w-th">啟用狀態</span>
+                        </div>
+                        <select class="form-control" v-model="configDetail.status" >
+                            <option value="active">啟用</option>
+                            <option value="inactive">未啟用</option>
+                        </select>
+                    </div>
+
+                    <button v-if="isEditMode" class="btn btn-primary btn-lg btn-block" @click="saveEdit">儲存修改</button>
+                    <button v-else class="btn btn-primary btn-lg btn-block" @click="addConfig">新增設定</button>
+                </div>
+                
+              </div>
+            </div>
+        </div>
+
    </div>
 </body>
 </html>
